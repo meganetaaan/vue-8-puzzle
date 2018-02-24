@@ -1,5 +1,7 @@
 # vue-8-puzzle
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/meganetaaan/vue-8-puzzle.svg)](https://greenkeeper.io/)
+
 > A Vue.js project
 
 ## Build Setup
