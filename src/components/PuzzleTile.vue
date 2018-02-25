@@ -5,12 +5,10 @@
 </template>
 
 <script>
-import gif from '../assets/maze-resize.gif'
 export default {
   name: 'PuzzleTile',
   data () {
     return {
-      src: gif
     }
   }
 }

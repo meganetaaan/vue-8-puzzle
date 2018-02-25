@@ -23,18 +23,28 @@ export default {
     const loop = () => {
       const sourceImg = this.$refs.sourceImg
       const ctx = this.$refs.canvas.getContext('2d')
-      const sourceX = 0
-      const sourceY = 0
-      const sourceWidth = 100
-      const sourceHeight = 100
+      const sourceX = 200
+      const sourceY = 200
+      const sourceWidth = 300
+      const sourceHeight = 300
       const targetX = 0
       const targetY = 0
-      const targetWidth = sourceWidth
-      const targetHeight = sourceHeight
+      const targetWidth = 100
+      const targetHeight = 100
       ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
       requestAnimationFrame(loop)
     }
     this.$nextTick(loop)
+  },
+  methods: {
+    render () {
+      this.tiles.forEach(() => {
+
+      })
+    },
+    renderTile () {
+
+    }
   }
 }
 </script>

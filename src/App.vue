@@ -1,7 +1,5 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <canvas ref="cvs" />
     <puzzle-board/>
   </div>
 </template>
@@ -13,6 +11,8 @@ export default {
   name: 'App',
   components: {
     PuzzleBoard
+  },
+  mounted: () => {
   }
 }
 </script>
