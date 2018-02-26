@@ -21,7 +21,7 @@ class Board {
     for (let i = 0; i < this.n; i++) {
       for (let j = 0; j < this.n; j++) {
         this.blocks[k] = blocks[i][j]
-        if (this.blocks[i][j] === 0) {
+        if (blocks[i][j] === 0) {
           this.blankpos = k
         }
         k++

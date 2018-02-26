@@ -8,12 +8,14 @@
 <script>
 import gif from '../assets/maze-resize.gif'
 import vid from '../assets/me.webm'
+import Board from '../board.ts'
 
 export default {
   name: 'PuzzleBoard',
   data () {
+    const board = new Board([[1, 2, 3], [4, 5, 6], [7, 8]])
     return {
-      board: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+      board,
       src: gif,
       vidSrc: vid,
       targetSrc: null
