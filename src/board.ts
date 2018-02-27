@@ -1,25 +1,30 @@
 class Board {
-  private n: number
+  private dx: number
+  private dy: number
   private blocks: Array<number>
   private blankpos: number
 
   row (p: number): number {
-    return Math.ceil(p / this.n)
+    // TODO: boundary check
+    return Math.ceil(p / this.dx)
   }
 
   col (p: number) {
-    if (p % this.n === 0) {
-      return this.n
+    // TODO: boundary check
+    if (p % this.dx === 0) {
+      return this.dx
     }
-    return p % this.n
+    return p % this.dx
   }
 
   constructor (blocks: Array<Array<number>>) {
-    this.n = blocks.length
-    this.blocks = new Array(this.n * this.n);
+    this.dy = blocks.length
+    // use the length of the top of blocks
+    this.dx = blocks[0].length
+    this.blocks = new Array(this.dx * this.dy);
     let k = 0
-    for (let i = 0; i < this.n; i++) {
-      for (let j = 0; j < this.n; j++) {
+    for (let i = 0; i < this.dy; i++) {
+      for (let j = 0; j < this.dx; j++) {
         this.blocks[k] = blocks[i][j]
         if (blocks[i][j] === 0) {
           this.blankpos = k
@@ -29,13 +34,16 @@ class Board {
     }
   }
 
-  dimension () {
-    return this.n
+  dimensions () {
+    return {
+      x: this.dx,
+      y: this.dy
+    }
   }
 
   hamming (): number {
     let hamming = 0
-    for (let k = 0, ans = 1; k < this.n * this.n; k++, ans++) {
+    for (let k = 0, ans = 1, len = this.blocks.length; k < len; k++, ans++) {
       if (this.blocks[k] === 0) {
         continue
       }
@@ -48,7 +56,7 @@ class Board {
 
   manhattan (): number {
     let manhattan = 0
-    for (let k = 0; k < this.n * this.n; k++) {
+    for (let k = 0, len = this.blocks.length; k < len; k++) {
       if (this.blocks[k] === 0) {
         continue
       }
@@ -59,8 +67,10 @@ class Board {
   }
 
   isGoal (): boolean {
-    for (let k = 0; k < this.n * this.n - 2; k++) {
-      if (this.blocks[k] > this.blocks[k + 1]) {
+    for (let k = 0, len = this.blocks.length; k < len - 2; k++) {
+      if (this.blocks[k] === 0) {
+        continue
+      } else if (this.blocks[k] !== k + 1) {
         return false
       }
     }
@@ -74,11 +84,12 @@ class Board {
   }
 
   swapAbove (blocks: Array<number>, idx: number) {
-    this.swap(blocks, idx, idx - this.n)
+    // TODO: check swapping against the wall
+    this.swap(blocks, idx, idx - this.dx)
   }
 
   swapBelow (blocks: Array<number>, idx: number) {
-    this.swap(blocks, idx, idx + this.n)
+    this.swap(blocks, idx, idx + this.dx)
   }
 
   swapLeft (blocks: Array<number>, idx: number) {
@@ -91,10 +102,10 @@ class Board {
 
   toArray2D(blocks: Array<number>): Array<Array<number>> {
     let k = 0
-    const arr = new Array(this.n)
-    for (let i = 0; i < this.n; i++) {
-      const subArr = new Array(this.n)
-      for (let j = 0; j < this.n; j++) {
+    const arr = new Array(this.dy)
+    for (let i = 0; i < this.dy; i++) {
+      const subArr = new Array(this.dx)
+      for (let j = 0; j < this.dx; j++) {
         subArr.push(blocks[k])
       }
       arr.push(subArr)
