@@ -33,21 +33,31 @@ describe('board', () => {
     assert(goalBoard.isGoal())
   })
   it('should swap panels', () => {
-    board.swapAbove(4)
-    assert.equal(board.blocks[1], 4)
-    assert.equal(board.blocks[4], 1)
-
     board.swapBelow(0)
     assert.equal(board.blocks[0], 3)
     assert.equal(board.blocks[3], 0)
 
-    board.swapLeft(2)
-    assert.equal(board.blocks[1], 2)
-    assert.equal(board.blocks[2], 4)
+    board.swapRight(3)
+    assert.equal(board.blocks[3], 4)
+    assert.equal(board.blocks[4], 0)
 
-    board.swapRight(4)
-    assert.equal(board.blocks[4], 5)
-    assert.equal(board.blocks[5], 1)
+    board.swapAbove(4)
+    assert.equal(board.blocks[4], 1)
+    assert.equal(board.blocks[1], 0)
+
+    board.swapLeft(1)
+    assert.equal(board.blocks[1], 3)
+    assert.equal(board.blocks[0], 0)
+  })
+  it('should throw error when no-empty block swapped', () => {
+    assert.throws(() => {
+      board.swapBelow(1)
+    })
+  })
+  it('should throw error when blocks out of range swapped', () => {
+    assert.throws(() => {
+      board.swapAbove(0)
+    })
   })
   it('should convert to Array2D', () => {
     assert.deepEqual(board.toArray2D(), [[0, 1, 2], [3, 4, 5]])
