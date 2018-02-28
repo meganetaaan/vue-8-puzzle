@@ -83,30 +83,30 @@ class Board {
     }
   }
 
-  swapAbove (blocks: Array<number>, idx: number) {
-    // TODO: check swapping against the wall
-    this.swap(blocks, idx, idx - this.dx)
+  swapAbove (idx: number) {
+    // TODO: range check
+    this.swap(this.blocks, idx, idx - this.dx)
   }
 
-  swapBelow (blocks: Array<number>, idx: number) {
-    this.swap(blocks, idx, idx + this.dx)
+  swapBelow (idx: number) {
+    this.swap(this.blocks, idx, idx + this.dx)
   }
 
-  swapLeft (blocks: Array<number>, idx: number) {
-    this.swap(blocks, idx, idx - 1)
+  swapLeft (idx: number) {
+    this.swap(this.blocks, idx, idx - 1)
   }
 
-  swapRight (blocks: Array<number>, idx: number) {
-    this.swap(blocks, idx, idx + 1)
+  swapRight (idx: number) {
+    this.swap(this.blocks, idx, idx + 1)
   }
 
-  toArray2D(blocks: Array<number>): Array<Array<number>> {
+  toArray2D(): Array<Array<number>> {
     let k = 0
-    const arr = new Array(this.dy)
+    const arr = []
     for (let i = 0; i < this.dy; i++) {
-      const subArr = new Array(this.dx)
-      for (let j = 0; j < this.dx; j++) {
-        subArr.push(blocks[k])
+      const subArr = []
+      for (let j = 0; j < this.dx; j++, k++) {
+        subArr.push(this.blocks[k])
       }
       arr.push(subArr)
     }
