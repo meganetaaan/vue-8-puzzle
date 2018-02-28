@@ -88,6 +88,7 @@ class Board {
       throw new Error('cannot swap non-space block')
     }
     [blocks[from], blocks[to]] = [blocks[to], blocks[from]]
+    this.blankpos = blocks[from] === SPACE ? from : to
     return this
   }
 

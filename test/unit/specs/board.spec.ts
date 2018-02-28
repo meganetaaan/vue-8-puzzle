@@ -36,18 +36,22 @@ describe('board', () => {
     board.swapBelow(0)
     assert.equal(board.blocks[0], 3)
     assert.equal(board.blocks[3], 0)
+    assert.equal(board.blankpos, 3)
 
     board.swapRight(3)
     assert.equal(board.blocks[3], 4)
     assert.equal(board.blocks[4], 0)
+    assert.equal(board.blankpos, 4)
 
     board.swapAbove(4)
     assert.equal(board.blocks[4], 1)
     assert.equal(board.blocks[1], 0)
+    assert.equal(board.blankpos, 1)
 
     board.swapLeft(1)
     assert.equal(board.blocks[1], 3)
     assert.equal(board.blocks[0], 0)
+    assert.equal(board.blankpos, 0)
   })
   it('should throw error when no-empty block swapped', () => {
     assert.throws(() => {
