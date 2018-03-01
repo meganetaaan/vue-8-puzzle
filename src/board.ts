@@ -1,4 +1,11 @@
 const SPACE: number = 0
+enum Direction {
+  Above = 'Above',
+  Below = 'Below',
+  Left = 'Left',
+  Right = 'Right'
+}
+
 class Board {
   private dx: number
   private dy: number
@@ -46,6 +53,31 @@ class Board {
     }
   }
 
+  checkInRange (...idxs: number[]) {
+    for (let idx of idxs) {
+      if (this.blocks[idx] == null) {
+        throw new Error(`Index ${idx} not in range [0 .. ${this.blocks.length - 1}]`)
+      }
+    }
+  }
+
+  direction (from: number, to: number): null | Direction {
+    this.checkInRange(from, to)
+    if (to === from - 1) {
+      return Direction.Left
+    }
+    if (to === from + 1) {
+      return Direction.Right
+    }
+    if (to === from + this.dx) {
+      return Direction.Below
+    }
+    if (to === from - this.dx) {
+      return Direction.Above
+    }
+    return null
+  }
+
   hamming (): number {
     let hamming = 0
     for (let k = 0, ans = 1, len = this.blocks.length; k < len; k++, ans++) {
@@ -67,6 +99,7 @@ class Board {
       }
       const rowdiff = Math.abs(this.row(this.blocks[k]) - this.row(k + 1))
       const coldiff = Math.abs(this.col(this.blocks[k]) - this.col(k + 1))
+      manhattan += rowdiff + coldiff
     }
     return manhattan
   }
@@ -82,11 +115,8 @@ class Board {
     return true
   }
 
-  swap (blocks: Array<number>, from: number, to: number): Board {
-    if (this.blocks[from] == null || this.blocks[to] == null) {
-      // cannot swap blocks out of range
-      throw new Error('cannot swap blocks out of range')
-    }
+  private swap (blocks: Array<number>, from: number, to: number): Board {
+    this.checkInRange(from, to)
     if (this.blocks[from] !== SPACE && this.blocks[to] !== SPACE) {
       // cannot swap no-empty block
       throw new Error('cannot swap non-space block')
@@ -110,6 +140,22 @@ class Board {
 
   swapRight (idx: number): Board {
     return this.swap(this.blocks, idx, idx + 1)
+  }
+
+  slide (idx: number): Board {
+    this.checkInRange(idx)
+    switch(this.direction(idx, this.blankpos)) {
+      case Direction.Above:
+        return this.swapAbove(idx)
+      case Direction.Below:
+        return this.swapBelow(idx)
+      case Direction.Left:
+        return this.swapLeft(idx)
+      case Direction.Right:
+        return this.swapRight(idx)
+      default:
+        return this
+    }
   }
 
   toArray2D(): Array<Array<number>> {

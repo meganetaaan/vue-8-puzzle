@@ -31,9 +31,12 @@ describe('board', () => {
   })
   it('should return hamming distance', () => {
     assert.equal(board.hamming(), 5)
+    assert.equal(new Board([[1, 2, 3], [4, 5, 0]]).hamming(), 0)
   })
   it('should return manhattan distance', () => {
-    assert.equal(board.manhattan(), 0)
+    assert.equal(board.manhattan(), 7)
+    assert.equal(new Board([[1, 2, 3], [5, 4, 0]]).manhattan(), 2)
+    assert.equal(new Board([[1, 2, 3], [4, 5, 0]]).manhattan(), 0)
   })
   it('should return true when isGoal', () => {
     assert(!board.isGoal())
@@ -78,5 +81,9 @@ describe('board', () => {
   })
   it('should convert to Array2D', () => {
     assert.deepEqual(board.toArray2D(), [[0, 1, 2], [3, 4, 5]])
+  })
+  it('should slide blocks', () => {
+    board.slide(1).slide(4).slide(3).slide(0).slide(5)
+    assert.deepEqual(board.toArray2D(), [[0, 4, 2], [1, 3, 5]])
   })
 })
