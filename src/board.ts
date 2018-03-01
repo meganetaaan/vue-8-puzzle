@@ -5,23 +5,14 @@ class Board {
   private blocks: Array<number>
   private blankpos: number
 
-  row (p: number): number {
-    // TODO: boundary check
-    return Math.ceil(p / this.dx)
-  }
-
-  col (p: number) {
-    // TODO: boundary check
-    if (p % this.dx === SPACE) {
-      return this.dx
-    }
-    return p % this.dx
-  }
-
   constructor (blocks: Array<Array<number>>) {
     this.dy = blocks.length
     // use the length of the top of blocks
     this.dx = blocks[0].length
+    if (this.dy < 2 || this.dx < 2) {
+      // TODO: could drop some edge cases
+      throw new Error('cannot initialize with the array which has less than 2 col/rows')
+    }
     this.blocks = new Array(this.dx * this.dy);
     let k = 0
     for (let i = 0; i < this.dy; i++) {
@@ -33,6 +24,19 @@ class Board {
         k++
       }
     }
+  }
+
+  row (p: number): number {
+    // TODO: boundary check
+    return Math.ceil(p / this.dx)
+  }
+
+  col (p: number) {
+    // TODO: boundary check
+    if (p % this.dx === SPACE) {
+      return this.dx
+    }
+    return p % this.dx
   }
 
   dimensions (): {x: number, y: number} {

@@ -8,6 +8,14 @@ describe('board', () => {
     const array2D = [[0, 1, 2], [3, 4, 5]]
     board = new Board(array2D)
   })
+  it('should throw error when the array has less than two row/col', () => {
+    assert.throws(() => {
+      const b = new Board([[0, 1, 2]])
+    })
+    assert.throws(() => {
+      const b = new Board([[0], [1]])
+    })
+  })
   it('should render correct contents', () => {
     assert(board != null)
   })
@@ -52,6 +60,11 @@ describe('board', () => {
     assert.equal(board.blocks[1], 3)
     assert.equal(board.blocks[0], 0)
     assert.equal(board.blankpos, 0)
+
+    board.swapAbove(3)
+    assert.equal(board.blocks[3], 0)
+    assert.equal(board.blocks[0], 4)
+    assert.equal(board.blankpos, 3)
   })
   it('should throw error when no-empty block swapped', () => {
     assert.throws(() => {
