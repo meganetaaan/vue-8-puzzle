@@ -63,11 +63,13 @@ class Board {
 
   direction (from: number, to: number): null | Direction {
     this.checkInRange(from, to)
-    if (to === from - 1) {
-      return Direction.Left
-    }
-    if (to === from + 1) {
-      return Direction.Right
+    if (this.row(to + 1) === this.row(from + 1)) {
+      if (to % this.dx === (from % this.dx) - 1) {
+        return Direction.Left
+      }
+      if (to % this.dx === (from % this.dx) + 1) {
+        return Direction.Right
+      }
     }
     if (to === from + this.dx) {
       return Direction.Below
@@ -105,7 +107,7 @@ class Board {
   }
 
   isGoal (): boolean {
-    for (let k = 0, len = this.blocks.length; k < len - 2; k++) {
+    for (let k = 0, len = this.blocks.length; k < len; k++) {
       if (this.blocks[k] === SPACE) {
         continue
       } else if (this.blocks[k] !== k + 1) {
