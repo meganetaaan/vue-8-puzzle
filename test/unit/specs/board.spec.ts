@@ -20,9 +20,12 @@ describe('board', () => {
     assert(board != null)
   })
   it('should return row and col', () => {
-    assert.equal(board.col(5), 2)
+    assert.equal(board.col(1), 1)
     assert.equal(board.col(3), 3)
-    assert.equal(board.row(5), 2)
+    assert.equal(board.col(4), 1)
+    assert.equal(board.row(1), 1)
+    assert.equal(board.row(3), 1)
+    assert.equal(board.row(4), 2)
   })
   it('should return dimensions', () => {
     const d = board.dimensions()
@@ -83,7 +86,12 @@ describe('board', () => {
     assert.deepEqual(board.toArray2D(), [[0, 1, 2], [3, 4, 5]])
   })
   it('should slide blocks', () => {
-    board.slide(1).slide(4).slide(3).slide(0).slide(5)
+    board.slide(1)
+    board.slide(4)
+    board.slide(3)
+    board.slide(2)
+    board.slide(0)
+    board.slide(5)
     assert.deepEqual(board.toArray2D(), [[0, 4, 2], [1, 3, 5]])
   })
 })
