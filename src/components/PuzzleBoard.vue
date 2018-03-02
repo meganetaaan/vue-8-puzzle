@@ -8,8 +8,13 @@
     </div>
     <div class="puzzle-board">
       <transition-group>
-        <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)" @click="onClick(idx)">
-          {{block === 0 ? '' : block}}
+        <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
+        @click="onClick(idx)"
+        @mousedown.prevent
+        @mouseup.prevent
+        >
+          <img :style="getImageStyle(block, idx)" :src="imgSrc" />
+          <div :style="{position: 'absolute', fontColor: '#ddd'}">{{block === 0 ? '' : block}}</div>
         </div>
       </transition-group>
       <!-- <video ref="sourceImg" autoplay loop width="300" height="300" :src="vidSrc">No video</video>
@@ -21,6 +26,7 @@
 <script>
 // import gif from '../assets/maze-resize.gif'
 // import vid from '../assets/me.webm'
+import imgSrc from '../assets/robot.jpg'
 import Board from '../board.ts'
 import Vue from 'vue'
 
@@ -34,6 +40,7 @@ export default {
       isGoal: false,
       manhattan: null,
       hamming: null,
+      imgSrc,
       // src: gif,
       // vidSrc: vid,
       targetSrc: null,
@@ -66,13 +73,31 @@ export default {
     }
   },
   methods: {
+    getImageStyle (block, idx) {
+      const width = this.cellWidth * this.board.dx
+      const height = this.cellHeight * this.board.dy
+      console.log(width, this.cellWidth, this.board.dx)
+      const col = this.board.col(block) - 1
+      const row = this.board.row(block) - 1
+      const tx = this.cellHeight * col
+      const ty = this.cellWidth * row
+      return {
+        position: 'absolute',
+        margin: 0,
+        padding: 0,
+        width: `${width}px`,
+        height: `${height}px`,
+        transform: `translate(-${tx}px, -${ty}px`
+      }
+    },
     getBlockStyle (block, idx) {
       const isBlank = block === 0
       const top = (this.board.row(idx + 1) - 1) * this.cellHeight
       const left = (this.board.col(idx + 1) - 1) * this.cellWidth
       const style = {
+        userSelect: 'none',
+        display: isBlank ? 'none' : 'inherit',
         textAlign: 'left',
-        padding: '5px',
         fontSize: '2em',
         boxSizing: 'border-box',
         border: isBlank ? '' : '1px solid black',
@@ -81,7 +106,8 @@ export default {
         left: `${left}px`,
         top: `${top}px`,
         height: `${this.cellHeight}px`,
-        width: `${this.cellWidth}px`
+        width: `${this.cellWidth}px`,
+        overflow: 'hidden'
       }
       return style
     },
