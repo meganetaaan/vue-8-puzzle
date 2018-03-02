@@ -30,13 +30,38 @@ import imgSrc from '../assets/robot.jpg'
 import Board from '../board.ts'
 import Vue from 'vue'
 
+const shuffle = (arr) => {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const r = Math.floor(Math.random() * (i + 1))
+    let tmp = arr[i]
+    arr[i] = arr[r]
+    arr[r] = tmp
+  }
+  return arr
+}
+const createBoard2D = (dx, dy) => {
+  const len = dx * dy
+  const arr = []
+  for (let i = 0; i < len; i++) {
+    arr.push(i)
+  }
+  shuffle(arr)
+  const result = []
+  for (let i = 0; i < dy; i++) {
+    const sub = []
+    for (let j = 0; j < dx; j++) {
+      sub.push(arr[dx * i + j])
+    }
+    result.push(sub)
+  }
+  return result
+}
+
 export default {
   name: 'PuzzleBoard',
   data () {
-    const board = new Board([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 0]])
     return {
-      board,
-      blocks: board.blocks,
+      blocks: this.board.blocks,
       isGoal: false,
       manhattan: null,
       hamming: null,
@@ -46,6 +71,15 @@ export default {
       targetSrc: null,
       cellWidth: 200,
       cellHeight: 200
+    }
+  },
+  props: {
+    board: {
+      type: Board,
+      default: () => {
+        const board2D = createBoard2D(3, 3)
+        return new Board(board2D)
+      }
     }
   },
   mounted () {
@@ -66,6 +100,10 @@ export default {
     // this.$nextTick(loop)
   },
   watch: {
+    board () {
+      console.log()
+      this.blocks = this.board.blocks
+    },
     blocks () {
       this.isGoal = this.board.isGoal()
       this.manhattan = this.board.manhattan()
