@@ -1,11 +1,5 @@
 <template>
   <div>
-    <div class="status">
-      (Distance: {{manhattan}})
-      <div v-if="isGoal">
-        finish!!
-      </div>
-    </div>
     <div class="puzzle-board">
       <transition-group>
         <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
@@ -13,7 +7,7 @@
         @mousedown.prevent
         @mouseup.prevent
         >
-          <img :style="getImageStyle(block, idx)" :src="imgSrc" />
+          <img v-if="src" :style="getImageStyle(block, idx)" :src="src" />
           <div :style="{position: 'absolute', fontColor: '#ddd'}">{{block === 0 ? '' : block}}</div>
         </div>
       </transition-group>
@@ -26,7 +20,6 @@
 <script>
 // import gif from '../assets/maze-resize.gif'
 // import vid from '../assets/me.webm'
-import imgSrc from '../assets/robot.jpg'
 import Board from '../board.ts'
 import Vue from 'vue'
 
@@ -65,7 +58,6 @@ export default {
       isGoal: false,
       manhattan: null,
       hamming: null,
-      imgSrc,
       // src: gif,
       // vidSrc: vid,
       targetSrc: null,
@@ -80,6 +72,9 @@ export default {
         const board2D = createBoard2D(3, 3)
         return new Board(board2D)
       }
+    },
+    src: {
+      type: String
     }
   },
   mounted () {
@@ -108,6 +103,16 @@ export default {
       this.isGoal = this.board.isGoal()
       this.manhattan = this.board.manhattan()
       this.hamming = this.board.hamming()
+      this.$emit('change', {
+        blocks: this.blocks,
+        isGoal: this.isGoal,
+        distance: this.manhattan
+      })
+    },
+    isGoal () {
+      if (this.isGoal) {
+        this.$emit('finish')
+      }
     }
   },
   methods: {
@@ -165,11 +170,8 @@ export default {
 }
 .puzzle-board {
   position: absolute;
-  width: 600px;
-  height: 600px;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
 }
 .block {
   transition: all .3s ease,
