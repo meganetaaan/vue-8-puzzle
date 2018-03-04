@@ -1,19 +1,17 @@
 <template>
-  <div>
-    <div class="puzzle-board">
-      <transition-group>
-        <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
-        @click="onClick(idx)"
-        @mousedown.prevent
-        @mouseup.prevent
-        >
-          <img v-if="src" :style="getImageStyle(block, idx)" :src="src" />
-          <div :style="{position: 'absolute', fontColor: '#ddd'}">{{block === 0 ? '' : block}}</div>
-        </div>
-      </transition-group>
-      <!-- <video ref="sourceImg" autoplay loop width="300" height="300" :src="vidSrc">No video</video>
-      <canvas ref="canvas" id="targetImg" /> -->
-    </div>
+  <div class="puzzle-board">
+    <transition-group>
+      <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
+      @click="onClick(idx)"
+      @mousedown.prevent
+      @mouseup.prevent
+      >
+        <img v-if="src" :style="getImageStyle(block, idx)" :src="src" />
+        <div :style="{position: 'absolute', fontColor: '#ddd'}">{{block === 0 ? '' : block}}</div>
+      </div>
+    </transition-group>
+    <!-- <video ref="sourceImg" autoplay loop width="300" height="300" :src="vidSrc">No video</video>
+    <canvas ref="canvas" id="targetImg" /> -->
   </div>
 </template>
 
@@ -131,8 +129,8 @@ export default {
     getImageStyle (block, idx) {
       const col = this.board.col(block) - 1
       const row = this.board.row(block) - 1
-      const tx = this.cellHeight * col
-      const ty = this.cellWidth * row
+      const tx = this.cellWidth * col
+      const ty = this.cellHeight * row
       return {
         position: 'absolute',
         margin: 0,
