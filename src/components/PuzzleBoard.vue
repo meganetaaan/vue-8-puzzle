@@ -18,7 +18,6 @@
 </template>
 
 <script>
-// import gif from '../assets/maze-resize.gif'
 // import vid from '../assets/me.webm'
 import Board from '../board.ts'
 import Vue from 'vue'
@@ -58,11 +57,12 @@ export default {
       isGoal: false,
       manhattan: null,
       hamming: null,
-      // src: gif,
+      width: 0,
+      height: 0,
       // vidSrc: vid,
       targetSrc: null,
-      cellWidth: 200,
-      cellHeight: 200
+      dx: this.board.dx,
+      dy: this.board.dx
     }
   },
   props: {
@@ -77,7 +77,17 @@ export default {
       type: String
     }
   },
+  computed: {
+    cellWidth () {
+      return this.width / this.dx
+    },
+    cellHeight () {
+      return this.height / this.dy
+    }
+  },
   mounted () {
+    this.width = this.$el.offsetWidth
+    this.height = this.$el.offsetHeight
     // const loop = () => {
     //   const sourceImg = this.$refs.sourceImg
     //   const ctx = this.$refs.canvas.getContext('2d')
@@ -98,6 +108,8 @@ export default {
     board () {
       console.log()
       this.blocks = this.board.blocks
+      this.dx = this.board.dx
+      this.dy = this.board.dy
     },
     blocks () {
       this.isGoal = this.board.isGoal()
@@ -117,9 +129,6 @@ export default {
   },
   methods: {
     getImageStyle (block, idx) {
-      const width = this.cellWidth * this.board.dx
-      const height = this.cellHeight * this.board.dy
-      console.log(width, this.cellWidth, this.board.dx)
       const col = this.board.col(block) - 1
       const row = this.board.row(block) - 1
       const tx = this.cellHeight * col
@@ -128,8 +137,8 @@ export default {
         position: 'absolute',
         margin: 0,
         padding: 0,
-        width: `${width}px`,
-        height: `${height}px`,
+        width: `${this.width}px`,
+        height: `${this.height}px`,
         transform: `translate(-${tx}px, -${ty}px`
       }
     },
