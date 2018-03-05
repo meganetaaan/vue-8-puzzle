@@ -12,7 +12,8 @@
     <div class="container">
       <puzzle-board :src="imgSrc"
       @change="onPuzzleBoardChange"
-      @finish="onPuzzleBoardFinish"/>
+      @finish="onPuzzleBoardFinish"
+      :autoResize="autoResize"/>
     </div>
   </div>
 </template>
@@ -30,7 +31,8 @@ export default {
     return {
       imgSrc,
       distance: null,
-      isGoal: false
+      isGoal: false,
+      autoResize: true
     }
   },
   methods: {
@@ -57,6 +59,7 @@ html,body {
   color: #2c3e50;
 }
 .header {
+  z-index: 1;
   font-size: 1.2em;
   position: absolute;
   width: 100%;
@@ -72,7 +75,8 @@ html,body {
   transform: translate(-50%, -50%);
   width: 100%;
   height: 100%;
-  margin: 5px;
+  margin: 0px;
+  padding: 0px;
   max-width: 600px;
   max-height: 600px;
 }

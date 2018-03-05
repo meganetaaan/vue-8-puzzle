@@ -7,7 +7,7 @@
       @mouseup.prevent
       >
         <img v-if="src" :style="getImageStyle(block, idx)" :src="src" />
-        <div :style="{position: 'absolute', fontColor: '#ddd'}">{{block === 0 ? '' : block}}</div>
+        <div v-if="showNumber" class="tile-number">{{block === 0 ? '' : block}}</div>
       </div>
     </transition-group>
     <!-- <video ref="sourceImg" autoplay loop width="300" height="300" :src="vidSrc">No video</video>
@@ -19,6 +19,7 @@
 // import vid from '../assets/me.webm'
 import Board from '../board.ts'
 import Vue from 'vue'
+import debounce from 'lodash.debounce'
 
 const shuffle = (arr) => {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -73,6 +74,14 @@ export default {
     },
     src: {
       type: String
+    },
+    showNumber: {
+      type: Boolean,
+      default: true
+    },
+    autoResize: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -84,8 +93,8 @@ export default {
     }
   },
   mounted () {
-    this.width = this.$el.offsetWidth
-    this.height = this.$el.offsetHeight
+    this.onResize()
+    window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     // const loop = () => {
     //   const sourceImg = this.$refs.sourceImg
     //   const ctx = this.$refs.canvas.getContext('2d')
@@ -164,6 +173,12 @@ export default {
     onClick (idx) {
       this.board.slide(idx)
       Vue.set(this, 'blocks', this.board.blocks.concat())
+    },
+    onResize () {
+      if (this.autoResize) {
+        this.width = this.$el.offsetWidth
+        this.height = this.$el.offsetHeight
+      }
     }
   }
 }
@@ -181,6 +196,11 @@ export default {
   height: 100%;
 }
 .block {
-  transition: all .3s ease,
+  transition: all .3s ease;
+}
+.tile-number {
+  position: absolute;
+  text-shadow: 1px 1px 0 #222;
+  color: #FAFAFA;
 }
 </style>
