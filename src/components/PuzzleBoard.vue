@@ -185,9 +185,12 @@ export default {
       this.$el.focus()
     },
     onResize () {
+      const size = Math.min(this.$el.offsetWidth, this.$el.offsetHeight)
+      const w = size
+      const h = size
       if (this.autoResize) {
-        this.width = this.$el.offsetWidth
-        this.height = this.$el.offsetHeight
+        this.width = w
+        this.height = h
       }
     },
     onKeyUp (event) {
