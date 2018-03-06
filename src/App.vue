@@ -70,7 +70,7 @@ html,body {
 }
 .container {
   position: absolute;
-  top: 50%;
+  top: calc(50% + 60px);
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
