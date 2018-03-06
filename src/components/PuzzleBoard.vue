@@ -1,5 +1,8 @@
 <template>
-  <div class="puzzle-board">
+  <div class="puzzle-board"
+  tabindex="-1"
+  @keyup.prevent="onKeyUp"
+  >
     <transition-group>
       <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
       @click="onClick(idx)"
@@ -170,14 +173,33 @@ export default {
       }
       return style
     },
-    onClick (idx) {
+    slide (idx) {
       this.board.slide(idx)
       Vue.set(this, 'blocks', this.board.blocks.concat())
+    },
+    onClick (idx) {
+      this.slide(idx)
     },
     onResize () {
       if (this.autoResize) {
         this.width = this.$el.offsetWidth
         this.height = this.$el.offsetHeight
+      }
+    },
+    onKeyUp (event) {
+      const bp = this.board.blankpos
+      switch (event.keyCode) {
+        case 37:
+          this.slide(bp + 1)
+          break
+        case 38:
+          this.slide(bp + this.dx)
+          break
+        case 39:
+          this.slide(bp - 1)
+          break
+        case 40:
+          this.slide(bp - this.dx)
       }
     }
   }
