@@ -2,6 +2,7 @@
   <div class="puzzle-board"
   tabindex="-1"
   @keyup.prevent="onKeyUp"
+  @click="onClickBoard"
   >
     <transition-group>
       <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
@@ -180,6 +181,9 @@ export default {
     onClick (idx) {
       this.slide(idx)
     },
+    onClickBoard () {
+      this.$el.focus()
+    },
     onResize () {
       if (this.autoResize) {
         this.width = this.$el.offsetWidth
@@ -188,18 +192,27 @@ export default {
     },
     onKeyUp (event) {
       const bp = this.board.blankpos
+      const len = this.blocks.length
       switch (event.keyCode) {
         case 37:
-          this.slide(bp + 1)
+          if (bp + 1 < len) {
+            this.slide(bp + 1)
+          }
           break
         case 38:
-          this.slide(bp + this.dx)
+          if (bp + this.dx < len) {
+            this.slide(bp + this.dx)
+          }
           break
         case 39:
-          this.slide(bp - 1)
+          if (bp - 1 >= 0) {
+            this.slide(bp - 1)
+          }
           break
         case 40:
-          this.slide(bp - this.dx)
+          if (bp - this.dx >= 0) {
+            this.slide(bp - this.dx)
+          }
       }
     }
   }

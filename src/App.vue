@@ -65,7 +65,7 @@ html,body {
   width: 100%;
   height: 60px;
   color: #FAFAFA;
-  background-color: #673AB7;
+  background-color: #283593;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 .container {
