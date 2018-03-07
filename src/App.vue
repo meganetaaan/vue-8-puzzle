@@ -74,7 +74,7 @@ html,body {
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  height: 100%;
+  height: calc(100% - 60px);
   margin: 0px;
   padding: 0px;
   max-width: 600px;

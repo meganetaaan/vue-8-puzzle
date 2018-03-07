@@ -10,17 +10,17 @@
       @mousedown.prevent
       @mouseup.prevent
       >
-        <img v-if="src" :style="getImageStyle(block, idx)" :src="src" />
+        <!-- <img v-if="targetSrc" :style="getImageStyle(block, idx)" :src="targetSrc" /> -->
         <div v-if="showNumber" class="tile-number">{{block === 0 ? '' : block}}</div>
+        <canvas :ref="'canvas_' + block" class="targetImg" :width="cellWidth" :height="cellHeight"/>
       </div>
     </transition-group>
-    <!-- <video ref="sourceImg" autoplay loop width="300" height="300" :src="vidSrc">No video</video>
-    <canvas ref="canvas" id="targetImg" /> -->
+    <video ref="sourceImg" autoplay loop style="display: none;" width="300" height="300" :src="vidSrc">No video</video>
   </div>
 </template>
 
 <script>
-// import vid from '../assets/me.webm'
+import vid from '../assets/me.webm'
 import Board from '../board.ts'
 import Vue from 'vue'
 import debounce from 'lodash.debounce'
@@ -62,8 +62,8 @@ export default {
       hamming: null,
       width: 0,
       height: 0,
-      // vidSrc: vid,
-      targetSrc: null,
+      vidSrc: vid,
+      targetSrc: this.src,
       dx: this.board.dx,
       dy: this.board.dx
     }
@@ -99,21 +99,31 @@ export default {
   mounted () {
     this.onResize()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
-    // const loop = () => {
-    //   const sourceImg = this.$refs.sourceImg
-    //   const ctx = this.$refs.canvas.getContext('2d')
-    //   const sourceX = 200
-    //   const sourceY = 200
-    //   const sourceWidth = 300
-    //   const sourceHeight = 300
-    //   const targetX = 0
-    //   const targetY = 0
-    //   const targetWidth = 100
-    //   const targetHeight = 100
-    //   ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
-    //   requestAnimationFrame(loop)
-    // }
-    // this.$nextTick(loop)
+    const loop = () => {
+      const sourceImg = this.$refs.sourceImg
+      const sourceCellWidth = sourceImg.videoWidth / this.dx
+      const sourceCellHeight = sourceImg.videoHeight / this.dy
+      for (let block of this.blocks) {
+        if (block === 0) {
+          continue
+        }
+        const canvas = this.$refs[`canvas_${block}`][0]
+        const ctx = canvas.getContext('2d')
+        const row = this.board.row(block)
+        const col = this.board.col(block)
+        const sourceX = sourceCellWidth * (col - 1)
+        const sourceY = sourceCellHeight * (row - 1)
+        const sourceWidth = sourceCellWidth
+        const sourceHeight = sourceCellHeight
+        const targetX = 0
+        const targetY = 0
+        const targetWidth = this.cellWidth
+        const targetHeight = this.cellHeight
+        ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
+      }
+      requestAnimationFrame(loop)
+    }
+    this.$nextTick(loop)
   },
   watch: {
     board () {
