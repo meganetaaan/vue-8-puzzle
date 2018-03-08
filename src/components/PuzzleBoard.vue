@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import vid from '../assets/me.webm'
+import vid from '../assets/cat.webm'
 import Board from '../board.ts'
 import Vue from 'vue'
 import debounce from 'lodash.debounce'
