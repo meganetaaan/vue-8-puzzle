@@ -15,7 +15,7 @@
         <canvas :ref="'canvas_' + block" class="targetImg" :width="cellWidth" :height="cellHeight"/>
       </div>
     </transition-group>
-    <video ref="sourceImg" autoplay loop style="display: none;" width="300" height="300" :src="vidSrc">No video</video>
+    <video ref="sourceImg" autoplay loop :style="getSourceStyle()" :width="width" :height="height" :src="vidSrc">No video</video>
   </div>
 </template>
 
@@ -169,7 +169,7 @@ export default {
       const left = (this.board.col(idx + 1) - 1) * this.cellWidth
       const style = {
         userSelect: 'none',
-        display: isBlank ? 'none' : 'inherit',
+        display: isBlank || this.isGoal ? 'none' : 'inherit',
         textAlign: 'left',
         fontSize: '2em',
         boxSizing: 'border-box',
@@ -183,6 +183,14 @@ export default {
         overflow: 'hidden'
       }
       return style
+    },
+    getSourceStyle () {
+      return {
+        position: 'absolute',
+        display: this.isGoal ? 'block' : 'none',
+        top: 0,
+        left: 0
+      }
     },
     slide (idx) {
       this.board.slide(idx)
