@@ -100,9 +100,10 @@ export default {
     this.onResize()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     const loop = () => {
+      // TODO: choose trimming strategy
+      // trims square area from the center of the source
       const sourceImg = this.$refs.sourceImg
-      const sourceCellWidth = sourceImg.videoWidth / this.dx
-      const sourceCellHeight = sourceImg.videoHeight / this.dy
+      const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
       for (let block of this.blocks) {
         if (block === 0) {
           continue
@@ -111,10 +112,10 @@ export default {
         const ctx = canvas.getContext('2d')
         const row = this.board.row(block)
         const col = this.board.col(block)
-        const sourceX = sourceCellWidth * (col - 1)
-        const sourceY = sourceCellHeight * (row - 1)
-        const sourceWidth = sourceCellWidth
-        const sourceHeight = sourceCellHeight
+        const sourceX = sourceCellSize * (col - 1)
+        const sourceY = sourceCellSize * (row - 1)
+        const sourceWidth = sourceCellSize
+        const sourceHeight = sourceCellSize
         const targetX = 0
         const targetY = 0
         const targetWidth = this.cellWidth
