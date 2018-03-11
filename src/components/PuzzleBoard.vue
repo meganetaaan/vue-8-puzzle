@@ -198,6 +198,9 @@ export default {
       Vue.set(this, 'blocks', this.board.blocks.concat())
     },
     onClick (idx) {
+      if (this.$refs.sourceImg.currentTime < 0.01) {
+        this.$refs.sourceImg.play()
+      }
       this.slide(idx)
     },
     onClickBoard () {
