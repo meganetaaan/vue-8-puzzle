@@ -6,9 +6,10 @@
   >
     <transition-group>
       <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
-      @click="onClick(idx)"
+      @click.prevent
       @mousedown.prevent
-      @mouseup.prevent
+      @mouseup.prevent="onClick(idx)"
+      @touchend.prevent="onClick(idx)"
       >
         <!-- <img v-if="targetSrc" :style="getImageStyle(block, idx)" :src="targetSrc" /> -->
         <div v-if="showNumber" class="tile-number">{{block === 0 ? '' : block}}</div>
