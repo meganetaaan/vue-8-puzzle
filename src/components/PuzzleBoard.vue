@@ -112,8 +112,12 @@ export default {
         const ctx = canvas.getContext('2d')
         const row = this.board.row(block)
         const col = this.board.col(block)
-        const sourceX = sourceCellSize * (col - 1)
-        const sourceY = sourceCellSize * (row - 1)
+        // const marginX = 0
+        // const marginY = 0
+        const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
+        const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
+        const sourceX = sourceCellSize * (col - 1) + marginX
+        const sourceY = sourceCellSize * (row - 1) + marginY
         const sourceWidth = sourceCellSize
         const sourceHeight = sourceCellSize
         const targetX = 0
