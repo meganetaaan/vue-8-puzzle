@@ -99,32 +99,37 @@ export default {
   mounted () {
     this.onResize()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
+    this._lastRender = Date.now()
     const loop = () => {
-      // TODO: choose trimming strategy
-      // trims square area from the center of the source
-      const sourceImg = this.$refs.sourceImg
-      const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
-      for (let block of this.blocks) {
-        if (block === 0) {
-          continue
+      const now = Date.now()
+      if (now - this._lastRender > 100) {
+        this._lastRender = now
+        // TODO: choose trimming strategy
+        // trims square area from the center of the source
+        const sourceImg = this.$refs.sourceImg
+        const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
+        for (let block of this.blocks) {
+          if (block === 0) {
+            continue
+          }
+          const canvas = this.$refs[`canvas_${block}`][0]
+          const ctx = canvas.getContext('2d')
+          const row = this.board.row(block)
+          const col = this.board.col(block)
+          // const marginX = 0
+          // const marginY = 0
+          const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
+          const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
+          const sourceX = sourceCellSize * (col - 1) + marginX
+          const sourceY = sourceCellSize * (row - 1) + marginY
+          const sourceWidth = sourceCellSize
+          const sourceHeight = sourceCellSize
+          const targetX = 0
+          const targetY = 0
+          const targetWidth = this.cellWidth
+          const targetHeight = this.cellHeight
+          ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
         }
-        const canvas = this.$refs[`canvas_${block}`][0]
-        const ctx = canvas.getContext('2d')
-        const row = this.board.row(block)
-        const col = this.board.col(block)
-        // const marginX = 0
-        // const marginY = 0
-        const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
-        const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
-        const sourceX = sourceCellSize * (col - 1) + marginX
-        const sourceY = sourceCellSize * (row - 1) + marginY
-        const sourceWidth = sourceCellSize
-        const sourceHeight = sourceCellSize
-        const targetX = 0
-        const targetY = 0
-        const targetWidth = this.cellWidth
-        const targetHeight = this.cellHeight
-        ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
       }
       requestAnimationFrame(loop)
     }
