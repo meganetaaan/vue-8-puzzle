@@ -4,19 +4,15 @@
   @keyup.prevent="onKeyUp"
   @click="onClickBoard"
   >
-    <transition-group>
-      <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
-      @click.prevent
-      @mousedown.prevent
-      @mouseup.prevent="onClick(idx)"
-      @touchend.prevent="onClick(idx)"
-      >
-        <!-- <img v-if="targetSrc" :style="getImageStyle(block, idx)" :src="targetSrc" /> -->
-        <div v-if="showNumber" class="tile-number">{{block === 0 ? '' : block}}</div>
-        <canvas :ref="'canvas_' + block" class="targetImg" :width="cellWidth" :height="cellHeight"/>
-      </div>
-    </transition-group>
-    <video ref="sourceImg" autoplay loop :style="getSourceStyle()" :width="width" :height="height" :src="vidSrc">No video</video>
+    <canvas ref="puzzle-canvas" class="puzzle-canvas"
+    @click.prevent
+    @mousedown.prevent
+    @mouseup.prevent="onClick"
+    @touchend.prevent="onClick"
+    :width="width"
+    :height="height"
+    ></canvas>
+    <video ref="sourceImg" autoplay loop muted :style="getSourceStyle()" :width="width" :height="height" :src="vidSrc">No video</video>
   </div>
 </template>
 
@@ -103,30 +99,34 @@ export default {
     this._lastRender = Date.now()
     const loop = () => {
       const now = Date.now()
-      if (now - this._lastRender > 100) {
+      if (now - this._lastRender > 50) {
         this._lastRender = now
         // TODO: choose trimming strategy
         // trims square area from the center of the source
         const sourceImg = this.$refs.sourceImg
         const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
-        for (let block of this.blocks) {
+        const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
+        const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
+        const ctx = this.$refs['puzzle-canvas'].getContext('2d')
+
+        if (this._shouldClear) {
+          ctx.clearRect(0, 0, this.width, this.height)
+        }
+        for (let i = 0, len = this.blocks.length; i < len; i++) {
+          const block = this.blocks[i]
           if (block === 0) {
             continue
           }
-          const canvas = this.$refs[`canvas_${block}`][0]
-          const ctx = canvas.getContext('2d')
           const row = this.board.row(block)
           const col = this.board.col(block)
           // const marginX = 0
           // const marginY = 0
-          const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
-          const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
           const sourceX = sourceCellSize * (col - 1) + marginX
           const sourceY = sourceCellSize * (row - 1) + marginY
           const sourceWidth = sourceCellSize
           const sourceHeight = sourceCellSize
-          const targetX = 0
-          const targetY = 0
+          const targetY = (this.board.row(i + 1) - 1) * this.cellHeight
+          const targetX = (this.board.col(i + 1) - 1) * this.cellWidth
           const targetWidth = this.cellWidth
           const targetHeight = this.cellHeight
           ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
@@ -147,6 +147,7 @@ export default {
       this.isGoal = this.board.isGoal()
       this.manhattan = this.board.manhattan()
       this.hamming = this.board.hamming()
+      this.clearCanvas()
       this.$emit('change', {
         blocks: this.blocks,
         isGoal: this.isGoal,
@@ -203,11 +204,19 @@ export default {
         left: 0
       }
     },
+    clearCanvas () {
+      this._shouldClear = true
+      // const ctx = this.$refs['puzzle-canvas'].getContext('2d')
+      // ctx.clearRect(0, 0, this.width, this.height)
+    },
     slide (idx) {
       this.board.slide(idx)
       Vue.set(this, 'blocks', this.board.blocks.concat())
     },
-    onClick (idx) {
+    onClick (event) {
+      const col = Math.floor(event.offsetX / this.cellWidth)
+      const row = Math.floor(event.offsetY / this.cellHeight)
+      const idx = row * this.dx + col
       if (this.$refs.sourceImg.currentTime < 0.01) {
         this.$refs.sourceImg.play()
       }
@@ -260,13 +269,23 @@ export default {
   width: 300;
   height: 300;
 }
+.puzzle-canvas {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
 .puzzle-board {
   position: absolute;
   width: 100%;
   height: 100%;
+  background-color: #FAFAFA;
 }
 .block {
-  transition: all .3s ease;
+  /* transition: all .3s ease; */
 }
 .tile-number {
   position: absolute;
