@@ -9,7 +9,7 @@
     @mousedown.prevent
     @mouseup.prevent="onClick"
     @touchend.prevent="onClick"
-    :width="width"
+    :width="width * 2"
     :height="height"
     ></canvas>
     <video ref="sourceImg" autoplay loop muted :style="getSourceStyle()" :width="width" :height="height" :src="vidSrc">No video</video>
@@ -107,7 +107,15 @@ export default {
         const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
         const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
         const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
-        const ctx = this.$refs['puzzle-canvas'].getContext('2d')
+        const canvas = this.$refs['puzzle-canvas']
+        const ctx = canvas.getContext('2d')
+        const sourceWidth = sourceCellSize * this.dx
+        const sourceHeight = sourceCellSize * this.dy
+        const w = this.width
+        const h = this.height
+
+        // copies clipped video source to canvas for sync drawing
+        ctx.drawImage(sourceImg, marginX, marginY, sourceWidth, sourceHeight, w, 0, w, h)
 
         if (this._shouldClear) {
           ctx.clearRect(0, 0, this.width, this.height)
@@ -119,17 +127,15 @@ export default {
           }
           const row = this.board.row(block)
           const col = this.board.col(block)
-          // const marginX = 0
-          // const marginY = 0
-          const sourceX = sourceCellSize * (col - 1) + marginX
-          const sourceY = sourceCellSize * (row - 1) + marginY
-          const sourceWidth = sourceCellSize
-          const sourceHeight = sourceCellSize
-          const targetY = (this.board.row(i + 1) - 1) * this.cellHeight
-          const targetX = (this.board.col(i + 1) - 1) * this.cellWidth
           const targetWidth = this.cellWidth
           const targetHeight = this.cellHeight
-          ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
+          const sourceX = targetWidth * (col - 1) + w
+          const sourceY = targetHeight * (row - 1)
+          const sourceWidth = targetWidth
+          const sourceHeight = targetHeight
+          const targetY = (this.board.row(i + 1) - 1) * this.cellHeight
+          const targetX = (this.board.col(i + 1) - 1) * this.cellWidth
+          ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
         }
       }
       requestAnimationFrame(loop)
@@ -275,11 +281,12 @@ export default {
   padding: 0;
   top: 0;
   left: 0;
-  width: 100%;
+  width: 200%;
   height: 100%;
 }
 .puzzle-board {
   position: absolute;
+  overflow: hidden;
   width: 100%;
   height: 100%;
   background-color: #FAFAFA;
