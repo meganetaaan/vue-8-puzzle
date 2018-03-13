@@ -9,6 +9,7 @@
     @mousedown.prevent
     @mouseup.prevent="onClick"
     @touchend.prevent="onClick"
+    :style="getCanvasStyle()"
     :width="width * 2"
     :height="height"
     ></canvas>
@@ -99,7 +100,7 @@ export default {
     this._lastRender = Date.now()
     const loop = () => {
       const now = Date.now()
-      if (now - this._lastRender > 50) {
+      if (this.$refs.sourceImg && now - this._lastRender > 33) {
         this._lastRender = now
         // TODO: choose trimming strategy
         // trims square area from the center of the source
@@ -201,6 +202,11 @@ export default {
         overflow: 'hidden'
       }
       return style
+    },
+    getCanvasStyle () {
+      return {
+        left: this.isGoal ? '-100%' : 0
+      }
     },
     getSourceStyle () {
       return {
