@@ -4,19 +4,23 @@
   @keyup.prevent="onKeyUp"
   @click="onClickBoard"
   >
-    <transition-group>
-      <div class="block" v-for="(block, idx) of blocks" :key="block" :style="getBlockStyle(block, idx)"
-      @click.prevent
-      @mousedown.prevent
-      @mouseup.prevent="onClick(idx)"
-      @touchend.prevent="onClick(idx)"
-      >
-        <!-- <img v-if="targetSrc" :style="getImageStyle(block, idx)" :src="targetSrc" /> -->
-        <div v-if="showNumber" class="tile-number">{{block === 0 ? '' : block}}</div>
-        <canvas :ref="'canvas_' + block" class="targetImg" :width="cellWidth" :height="cellHeight"/>
-      </div>
-    </transition-group>
-    <video ref="sourceImg" autoplay loop :style="getSourceStyle()" :width="width" :height="height" :src="vidSrc">No video</video>
+    <canvas ref="puzzle-canvas" class="puzzle-canvas"
+    @click.prevent
+    @mousedown.prevent
+    @mouseup.prevent="onClick"
+    @touchend.prevent="onTouchEnd"
+    :style="getCanvasStyle()"
+    :width="width * 2"
+    :height="height"
+    ></canvas>
+    <video ref="sourceImg"
+    autoplay
+    loop
+    muted="true"
+    :style="getSourceStyle()"
+    :width="width"
+    :height="height"
+    :src="vidSrc">No video</video>
   </div>
 </template>
 
@@ -24,6 +28,7 @@
 import vid from '../assets/cat.webm'
 import Board from '../board.ts'
 import Vue from 'vue'
+import posterSrc from '../assets/robot.jpg'
 import debounce from 'lodash.debounce'
 
 const shuffle = (arr) => {
@@ -65,6 +70,7 @@ export default {
       height: 0,
       vidSrc: vid,
       targetSrc: this.src,
+      posterSrc: posterSrc,
       dx: this.board.dx,
       dy: this.board.dx
     }
@@ -100,36 +106,49 @@ export default {
   mounted () {
     this.onResize()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
-    this._lastRender = Date.now()
+    this._lastRender = -1
     const loop = () => {
-      const now = Date.now()
-      if (now - this._lastRender > 100) {
-        this._lastRender = now
+      if (this.$refs.sourceImg == null) {
+        requestAnimationFrame(loop)
+        return
+      }
+      const sourceImg = this.$refs.sourceImg
+      if (sourceImg.currentTime !== this._lastRender) {
+        this._lastRender = sourceImg.currentTime
         // TODO: choose trimming strategy
         // trims square area from the center of the source
-        const sourceImg = this.$refs.sourceImg
         const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
-        for (let block of this.blocks) {
+        const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
+        const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
+        const canvas = this.$refs['puzzle-canvas']
+        const ctx = canvas.getContext('2d')
+        const sourceWidth = sourceCellSize * this.dx
+        const sourceHeight = sourceCellSize * this.dy
+        const w = this.width
+        const h = this.height
+
+        // copies clipped video source to canvas for sync drawing
+        ctx.drawImage(sourceImg, marginX, marginY, sourceWidth, sourceHeight, w, 0, w, h)
+
+        if (this._shouldClear) {
+          ctx.clearRect(0, 0, this.width, this.height)
+        }
+        for (let i = 0, len = this.blocks.length; i < len; i++) {
+          const block = this.blocks[i]
           if (block === 0) {
             continue
           }
-          const canvas = this.$refs[`canvas_${block}`][0]
-          const ctx = canvas.getContext('2d')
           const row = this.board.row(block)
           const col = this.board.col(block)
-          // const marginX = 0
-          // const marginY = 0
-          const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
-          const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
-          const sourceX = sourceCellSize * (col - 1) + marginX
-          const sourceY = sourceCellSize * (row - 1) + marginY
-          const sourceWidth = sourceCellSize
-          const sourceHeight = sourceCellSize
-          const targetX = 0
-          const targetY = 0
           const targetWidth = this.cellWidth
           const targetHeight = this.cellHeight
-          ctx.drawImage(sourceImg, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
+          const sourceX = targetWidth * (col - 1) + w
+          const sourceY = targetHeight * (row - 1)
+          const sourceWidth = targetWidth
+          const sourceHeight = targetHeight
+          const targetY = (this.board.row(i + 1) - 1) * this.cellHeight
+          const targetX = (this.board.col(i + 1) - 1) * this.cellWidth
+          ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
         }
       }
       requestAnimationFrame(loop)
@@ -138,7 +157,6 @@ export default {
   },
   watch: {
     board () {
-      console.log()
       this.blocks = this.board.blocks
       this.dx = this.board.dx
       this.dy = this.board.dy
@@ -147,6 +165,7 @@ export default {
       this.isGoal = this.board.isGoal()
       this.manhattan = this.board.manhattan()
       this.hamming = this.board.hamming()
+      this.clearCanvas()
       this.$emit('change', {
         blocks: this.blocks,
         isGoal: this.isGoal,
@@ -195,19 +214,38 @@ export default {
       }
       return style
     },
+    getCanvasStyle () {
+      return {
+        left: this.isGoal ? '-100%' : 0
+      }
+    },
     getSourceStyle () {
       return {
-        position: 'absolute',
-        display: this.isGoal ? 'block' : 'none',
-        top: 0,
-        left: 0
+        display: 'none'
       }
+    },
+    clearCanvas () {
+      this._shouldClear = true
+      // const ctx = this.$refs['puzzle-canvas'].getContext('2d')
+      // ctx.clearRect(0, 0, this.width, this.height)
     },
     slide (idx) {
       this.board.slide(idx)
       Vue.set(this, 'blocks', this.board.blocks.concat())
     },
-    onClick (idx) {
+    onTouchEnd (event) {
+      const touch = event.changedTouches[0]
+      const rect = this.$el.getBoundingClientRect()
+      const ev = {
+        offsetX: touch.clientX - rect.left,
+        offsetY: touch.clientY - rect.top
+      }
+      this.onClick(ev)
+    },
+    onClick (event) {
+      const col = Math.floor(event.offsetX / this.cellWidth)
+      const row = Math.floor(event.offsetY / this.cellHeight)
+      const idx = row * this.dx + col
       if (this.$refs.sourceImg.currentTime < 0.01) {
         this.$refs.sourceImg.play()
       }
@@ -217,9 +255,8 @@ export default {
       this.$el.focus()
     },
     onResize () {
-      const size = Math.min(this.$el.offsetWidth, this.$el.offsetHeight)
-      const w = size
-      const h = size
+      const w = this.$el.offsetWidth
+      const h = this.$el.offsetHeight
       if (this.autoResize) {
         this.width = w
         this.height = h
@@ -260,13 +297,20 @@ export default {
   width: 300;
   height: 300;
 }
-.puzzle-board {
+.puzzle-canvas {
   position: absolute;
-  width: 100%;
+  margin: 0;
+  padding: 0;
+  top: 0;
+  left: 0;
+  width: 200%;
   height: 100%;
 }
-.block {
-  transition: all .3s ease;
+.puzzle-board {
+  position: absolute;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
 }
 .tile-number {
   position: absolute;
