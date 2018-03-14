@@ -8,7 +8,8 @@
     @click.prevent
     @mousedown.prevent
     @mouseup.prevent="onClick"
-    @touchend.prevent="onClick"
+    @touchmove.prevent="onTouchMove"
+    @touchend.prevent="onTouchEnd"
     :style="getCanvasStyle()"
     :width="width * 2"
     :height="height"
@@ -225,6 +226,15 @@ export default {
       this.board.slide(idx)
       Vue.set(this, 'blocks', this.board.blocks.concat())
     },
+    onTouchEnd (event) {
+      const touch = event.changedTouches[0]
+      const rect = this.$el.getBoundingClientRect()
+      const ev = {
+        offsetX: touch.clientX - rect.left,
+        offsetY: touch.clientY - rect.top
+      }
+      this.onClick(ev)
+    },
     onClick (event) {
       const col = Math.floor(event.offsetX / this.cellWidth)
       const row = Math.floor(event.offsetY / this.cellHeight)
@@ -238,9 +248,8 @@ export default {
       this.$el.focus()
     },
     onResize () {
-      const size = Math.min(this.$el.offsetWidth, this.$el.offsetHeight)
-      const w = size
-      const h = size
+      const w = this.$el.offsetWidth
+      const h = this.$el.offsetHeight
       if (this.autoResize) {
         this.width = w
         this.height = h
