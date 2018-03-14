@@ -8,13 +8,18 @@
     @click.prevent
     @mousedown.prevent
     @mouseup.prevent="onClick"
-    @touchmove.prevent="onTouchMove"
     @touchend.prevent="onTouchEnd"
     :style="getCanvasStyle()"
     :width="width * 2"
     :height="height"
     ></canvas>
-    <video ref="sourceImg" autoplay loop muted :style="getSourceStyle()" :width="width" :height="height" :src="vidSrc">No video</video>
+    <video ref="sourceImg"
+    autoplay
+    loop
+    :style="getSourceStyle()"
+    :width="width"
+    :height="height"
+    :src="vidSrc">No video</video>
   </div>
 </template>
 
@@ -22,6 +27,7 @@
 import vid from '../assets/cat.webm'
 import Board from '../board.ts'
 import Vue from 'vue'
+import posterSrc from '../assets/robot.jpg'
 import debounce from 'lodash.debounce'
 
 const shuffle = (arr) => {
@@ -63,6 +69,7 @@ export default {
       height: 0,
       vidSrc: vid,
       targetSrc: this.src,
+      posterSrc: posterSrc,
       dx: this.board.dx,
       dy: this.board.dx
     }
@@ -98,14 +105,17 @@ export default {
   mounted () {
     this.onResize()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
-    this._lastRender = Date.now()
+    this._lastRender = -1
     const loop = () => {
-      const now = Date.now()
-      if (this.$refs.sourceImg && now - this._lastRender > 33) {
-        this._lastRender = now
+      if (this.$refs.sourceImg == null) {
+        requestAnimationFrame(loop)
+        return
+      }
+      const sourceImg = this.$refs.sourceImg
+      if (sourceImg.currentTime !== this._lastRender) {
+        this._lastRender = sourceImg.currentTime
         // TODO: choose trimming strategy
         // trims square area from the center of the source
-        const sourceImg = this.$refs.sourceImg
         const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
         const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
         const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
