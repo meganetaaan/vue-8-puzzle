@@ -221,10 +221,7 @@ export default {
     },
     getSourceStyle () {
       return {
-        position: 'absolute',
-        display: this.isGoal ? 'block' : 'none',
-        top: 0,
-        left: 0
+        display: 'none'
       }
     },
     clearCanvas () {
@@ -314,10 +311,6 @@ export default {
   overflow: hidden;
   width: 100%;
   height: 100%;
-  background-color: #FAFAFA;
-}
-.block {
-  /* transition: all .3s ease; */
 }
 .tile-number {
   position: absolute;

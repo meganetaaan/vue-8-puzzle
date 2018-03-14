@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     <div class="header">
-      Vue-8-Puzzle
-      <div class="status">
-        (Distance: {{distance}})
-        <div v-if="isGoal">
+      <span class="header-item title">Vue-8-Puzzle</span>
+      <span class="header-item distance"> Distance: {{distance}} </span>
+      <span class="header-item">
+        <template v-if="isGoal">
           finish!!
-        </div>
-      </div>
+        </template>
+      </span>
     </div>
     <div class="container">
       <puzzle-board :src="imgSrc"
@@ -59,8 +59,12 @@ html,body {
   color: #2c3e50;
 }
 .header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
   z-index: 1;
-  font-size: 1.2em;
+  font-size: 1.4em;
   position: absolute;
   width: 100%;
   height: 60px;
@@ -68,16 +72,24 @@ html,body {
   background-color: #283593;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
+.header-item {
+  flex-grow: 1;
+}
+.title {
+  font-weight: bold;
+}
 .container {
   position: absolute;
   top: calc(50% + 30px);
   left: 50%;
   transform: translate(-50%, -50%);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.16), 0 2px 4px rgba(0,0,0,0.23);
   width: 100%;
   height: calc(100% - 60px);
   margin: 0px;
   padding: 0px;
   max-width: 600px;
   max-height: 600px;
+  background-color: #DDD;
 }
 </style>
