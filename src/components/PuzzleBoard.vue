@@ -16,6 +16,7 @@
     <video ref="sourceImg"
     autoplay
     loop
+    muted="true"
     :style="getSourceStyle()"
     :width="width"
     :height="height"
@@ -156,7 +157,6 @@ export default {
   },
   watch: {
     board () {
-      console.log()
       this.blocks = this.board.blocks
       this.dx = this.board.dx
       this.dy = this.board.dy
