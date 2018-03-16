@@ -145,8 +145,8 @@ export default {
           if (block === 0) {
             continue
           }
-          const row = this.board.row(block)
-          const col = this.board.col(block)
+          const row = this.board.row(block - 1)
+          const col = this.board.col(block - 1)
           const sourceX = this.cellWidth * col + w
           const sourceY = this.cellHeight * row
           const pos = this._blockPositions[block]
