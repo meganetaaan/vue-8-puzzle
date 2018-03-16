@@ -106,8 +106,8 @@ export default {
     }
   },
   mounted () {
-    this.updateBlockPositions()
     this.onResize()
+    this.updateBlockPositions()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     this._lastRender = -1
     const loop = () => {
@@ -142,14 +142,14 @@ export default {
           }
           const row = this.board.row(block)
           const col = this.board.col(block)
-          const sourceX = this.cellWidth * (col - 1) + w
-          const sourceY = this.cellHeight * (row - 1)
-          const pos = this._blockPositions[i]
+          const sourceX = this.cellWidth * col + w
+          const sourceY = this.cellHeight * row
+          const pos = this._blockPositions[block]
+          if (pos == null) {
+            continue
+          }
           const targetX = pos.x
           const targetY = pos.y
-          // const anim = block === 1 ? this._animatedNumber : 0
-          // const targetY = (this.board.row(i + 1) - 1) * this.cellHeight
-          // const targetX = (this.board.col(i + 1) - 1) * this.cellWidth + anim
           ctx.drawImage(canvas,
             sourceX, sourceY, this.cellWidth, this.cellHeight,
             targetX, targetY, this.cellWidth, this.cellHeight)
@@ -184,66 +184,29 @@ export default {
   },
   methods: {
     updateBlockPositions () {
-      console.log(this._blockPositions)
-      const vm = this
       for (let i = 0, len = this.blocks.length; i < len; i++) {
-        const col = this.board.col(i) - 1
-        const row = this.board.row(i) - 1
+        const b = this.blocks[i]
+        const col = this.board.col(i)
+        const row = this.board.row(i)
         const x = this.cellWidth * col
         const y = this.cellHeight * row
-        const from = this._blockPositions[i] || {x: 0, y: 0}
-        if (this._blockPositions[i] == null) {
-          this._blockPositions[i] = from
+        const from = this._blockPositions[b] || {x: 0, y: 0}
+        if (this._blockPositions[b] == null) {
+          this._blockPositions[b] = from
         }
         if (from.x - x === 0 && from.y - y === 0) {
           continue
         }
-        console.log()
         const obj = {x: from.x, y: from.y}
         new TWEEN.Tween(obj)
-          .to({x, y}, 300)
+          .to({x, y}, 200)
           .easing(TWEEN.Easing.Quadratic.Out)
-          .onUpdate(function () {
-            vm._blockPositions[i].x = obj.x
-            vm._blockPositions[i].y = obj.y
+          .onUpdate(() => {
+            this._blockPositions[b].x = obj.x
+            this._blockPositions[b].y = obj.y
           })
           .start()
       }
-    },
-    getImageStyle (block, idx) {
-      const col = this.board.col(block) - 1
-      const row = this.board.row(block) - 1
-      const tx = this.cellWidth * col
-      const ty = this.cellHeight * row
-      return {
-        position: 'absolute',
-        margin: 0,
-        padding: 0,
-        width: `${this.width}px`,
-        height: `${this.height}px`,
-        transform: `translate(-${tx}px, -${ty}px`
-      }
-    },
-    getBlockStyle (block, idx) {
-      const isBlank = block === 0
-      const top = (this.board.row(idx + 1) - 1) * this.cellHeight
-      const left = (this.board.col(idx + 1) - 1) * this.cellWidth
-      const style = {
-        userSelect: 'none',
-        display: isBlank || this.isGoal ? 'none' : 'inherit',
-        textAlign: 'left',
-        fontSize: '2em',
-        boxSizing: 'border-box',
-        border: isBlank ? '' : '1px solid black',
-        backgroundColor: isBlank ? '' : '#FFF',
-        position: 'absolute',
-        left: `${left}px`,
-        top: `${top}px`,
-        height: `${this.cellHeight}px`,
-        width: `${this.cellWidth}px`,
-        overflow: 'hidden'
-      }
-      return style
     },
     getCanvasStyle () {
       return {
