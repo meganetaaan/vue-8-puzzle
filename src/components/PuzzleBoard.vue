@@ -30,6 +30,7 @@ import Board from '../board.ts'
 import Vue from 'vue'
 import posterSrc from '../assets/robot.jpg'
 import debounce from 'lodash.debounce'
+import TWEEN from 'tween.js'
 
 const shuffle = (arr) => {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -61,6 +62,7 @@ const createBoard2D = (dx, dy) => {
 export default {
   name: 'PuzzleBoard',
   data () {
+    this._blockPositions = []
     return {
       blocks: this.board.blocks,
       isGoal: false,
@@ -104,10 +106,12 @@ export default {
     }
   },
   mounted () {
+    this.updateBlockPositions()
     this.onResize()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     this._lastRender = -1
     const loop = () => {
+      TWEEN.update()
       if (this.$refs.sourceImg == null) {
         requestAnimationFrame(loop)
         return
@@ -127,12 +131,10 @@ export default {
         const w = this.width
         const h = this.height
 
+        ctx.clearRect(0, 0, this.width, this.height)
+
         // copies clipped video source to canvas for sync drawing
         ctx.drawImage(sourceImg, marginX, marginY, sourceWidth, sourceHeight, w, 0, w, h)
-
-        if (this._shouldClear) {
-          ctx.clearRect(0, 0, this.width, this.height)
-        }
         for (let i = 0, len = this.blocks.length; i < len; i++) {
           const block = this.blocks[i]
           if (block === 0) {
@@ -140,15 +142,17 @@ export default {
           }
           const row = this.board.row(block)
           const col = this.board.col(block)
-          const targetWidth = this.cellWidth
-          const targetHeight = this.cellHeight
-          const sourceX = targetWidth * (col - 1) + w
-          const sourceY = targetHeight * (row - 1)
-          const sourceWidth = targetWidth
-          const sourceHeight = targetHeight
-          const targetY = (this.board.row(i + 1) - 1) * this.cellHeight
-          const targetX = (this.board.col(i + 1) - 1) * this.cellWidth
-          ctx.drawImage(canvas, sourceX, sourceY, sourceWidth, sourceHeight, targetX, targetY, targetWidth, targetHeight)
+          const sourceX = this.cellWidth * (col - 1) + w
+          const sourceY = this.cellHeight * (row - 1)
+          const pos = this._blockPositions[i]
+          const targetX = pos.x
+          const targetY = pos.y
+          // const anim = block === 1 ? this._animatedNumber : 0
+          // const targetY = (this.board.row(i + 1) - 1) * this.cellHeight
+          // const targetX = (this.board.col(i + 1) - 1) * this.cellWidth + anim
+          ctx.drawImage(canvas,
+            sourceX, sourceY, this.cellWidth, this.cellHeight,
+            targetX, targetY, this.cellWidth, this.cellHeight)
         }
       }
       requestAnimationFrame(loop)
@@ -162,10 +166,10 @@ export default {
       this.dy = this.board.dy
     },
     blocks () {
+      this.updateBlockPositions()
       this.isGoal = this.board.isGoal()
       this.manhattan = this.board.manhattan()
       this.hamming = this.board.hamming()
-      this.clearCanvas()
       this.$emit('change', {
         blocks: this.blocks,
         isGoal: this.isGoal,
@@ -179,6 +183,33 @@ export default {
     }
   },
   methods: {
+    updateBlockPositions () {
+      console.log(this._blockPositions)
+      const vm = this
+      for (let i = 0, len = this.blocks.length; i < len; i++) {
+        const col = this.board.col(i) - 1
+        const row = this.board.row(i) - 1
+        const x = this.cellWidth * col
+        const y = this.cellHeight * row
+        const from = this._blockPositions[i] || {x: 0, y: 0}
+        if (this._blockPositions[i] == null) {
+          this._blockPositions[i] = from
+        }
+        if (from.x - x === 0 && from.y - y === 0) {
+          continue
+        }
+        console.log()
+        const obj = {x: from.x, y: from.y}
+        new TWEEN.Tween(obj)
+          .to({x, y}, 300)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(function () {
+            vm._blockPositions[i].x = obj.x
+            vm._blockPositions[i].y = obj.y
+          })
+          .start()
+      }
+    },
     getImageStyle (block, idx) {
       const col = this.board.col(block) - 1
       const row = this.board.row(block) - 1
@@ -223,11 +254,6 @@ export default {
       return {
         display: 'none'
       }
-    },
-    clearCanvas () {
-      this._shouldClear = true
-      // const ctx = this.$refs['puzzle-canvas'].getContext('2d')
-      // ctx.clearRect(0, 0, this.width, this.height)
     },
     slide (idx) {
       this.board.slide(idx)
