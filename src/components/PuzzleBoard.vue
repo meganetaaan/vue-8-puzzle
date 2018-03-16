@@ -4,6 +4,7 @@
   @keyup.prevent="onKeyUp"
   @click="onClickBoard"
   >
+    <div class="puzzle-message" v-if="isTouchNeeded">Touch to start</div>
     <canvas ref="puzzle-canvas" class="puzzle-canvas"
     @click.prevent
     @mousedown.prevent
@@ -64,6 +65,7 @@ export default {
   data () {
     this._blockPositions = []
     return {
+      isTouchNeeded: true,
       blocks: this.board.blocks,
       isGoal: false,
       manhattan: null,
@@ -110,6 +112,9 @@ export default {
     this.updateBlockPositions()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     this._lastRender = -1
+    this.$refs.sourceImg.addEventListener('play', () => {
+      this.isTouchNeeded = false
+    })
     const loop = () => {
       TWEEN.update()
       if (this.$refs.sourceImg == null) {
@@ -223,6 +228,10 @@ export default {
       Vue.set(this, 'blocks', this.board.blocks.concat())
     },
     onTouchEnd (event) {
+      if (this.isTouchNeeded) {
+        this.$refs.sourceImg.play()
+        this.isTouchNeeded = false
+      }
       const touch = event.changedTouches[0]
       const rect = this.$el.getBoundingClientRect()
       const ev = {
@@ -235,9 +244,6 @@ export default {
       const col = Math.floor(event.offsetX / this.cellWidth)
       const row = Math.floor(event.offsetY / this.cellHeight)
       const idx = row * this.dx + col
-      if (this.$refs.sourceImg.currentTime < 0.01) {
-        this.$refs.sourceImg.play()
-      }
       this.slide(idx)
     },
     onClickBoard () {
@@ -293,6 +299,11 @@ export default {
   top: 0;
   left: 0;
   width: 200%;
+  height: 100%;
+}
+.puzzle-message {
+  position: absolute;
+  width: 100%;
   height: 100%;
 }
 .puzzle-board {
