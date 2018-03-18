@@ -34,15 +34,10 @@ class Board {
   }
 
   row (p: number): number {
-    // TODO: boundary check
-    return Math.ceil(p / this.dx)
+    return Math.floor(p / this.dx)
   }
 
   col (p: number) {
-    // TODO: boundary check
-    if (p % this.dx === SPACE) {
-      return this.dx
-    }
     return p % this.dx
   }
 
@@ -63,7 +58,7 @@ class Board {
 
   direction (from: number, to: number): null | Direction {
     this.checkInRange(from, to)
-    if (this.row(to + 1) === this.row(from + 1)) {
+    if (this.row(to) === this.row(from)) {
       if (to % this.dx === (from % this.dx) - 1) {
         return Direction.Left
       }
@@ -99,8 +94,8 @@ class Board {
       if (this.blocks[k] === SPACE) {
         continue
       }
-      const rowdiff = Math.abs(this.row(this.blocks[k]) - this.row(k + 1))
-      const coldiff = Math.abs(this.col(this.blocks[k]) - this.col(k + 1))
+      const rowdiff = Math.abs(this.row(this.blocks[k] - 1) - this.row(k))
+      const coldiff = Math.abs(this.col(this.blocks[k] - 1) - this.col(k))
       manhattan += rowdiff + coldiff
     }
     return manhattan

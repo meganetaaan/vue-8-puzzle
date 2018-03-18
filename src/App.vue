@@ -4,16 +4,23 @@
       <span class="header-item title">Vue-8-Puzzle</span>
       <span class="header-item distance"> Distance: {{distance}} </span>
       <span class="header-item">
+        <label for="showNumber">Show Number:</label>
+        <input type="checkbox" id="showNumber" v-model="showNumber" />
+      </span>
+      <span class="header-item">
         <template v-if="isGoal">
           finish!!
         </template>
       </span>
     </div>
     <div class="container">
-      <puzzle-board :src="imgSrc"
+      <puzzle-board
+      :src="imgSrc"
+      :autoResize="autoResize"
+      :showNumber="showNumber"
       @change="onPuzzleBoardChange"
       @finish="onPuzzleBoardFinish"
-      :autoResize="autoResize"/>
+      />
     </div>
   </div>
 </template>
@@ -32,7 +39,8 @@ export default {
       imgSrc,
       distance: null,
       isGoal: false,
-      autoResize: true
+      autoResize: true,
+      showNumber: false
     }
   },
   methods: {
