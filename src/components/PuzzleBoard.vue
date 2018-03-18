@@ -113,6 +113,10 @@ export default {
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     this._lastRender = -1
     this.$refs.sourceImg.addEventListener('play', () => {
+      const ctx = this.$refs['puzzle-canvas'].getContext('2d')
+      ctx.font = "24px 'Avenir', Helvetica, Arial, sans-serif"
+      ctx.fillStyle = '#fafafa'
+      ctx.textBaseline = 'top'
       this.isTouchNeeded = false
     })
     const loop = () => {
@@ -140,6 +144,19 @@ export default {
 
         // copies clipped video source to canvas for sync drawing
         ctx.drawImage(sourceImg, marginX, marginY, sourceWidth, sourceHeight, w, 0, w, h)
+
+        // number
+        if (!this.isGoal && this.showNumber) {
+          for (let i = 0, len = this.blocks.length; i < len; i++) {
+            const r = Math.floor(i / this.dx)
+            const c = i % this.dx
+            const text = String(i + 1)
+            const margin = 5
+            ctx.strokeText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
+            ctx.fillText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
+          }
+        }
+
         for (let i = 0, len = this.blocks.length; i < len; i++) {
           const block = this.blocks[i]
           if (block === 0) {
