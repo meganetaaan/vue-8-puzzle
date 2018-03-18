@@ -20,13 +20,15 @@
     muted="true"
     :style="getSourceStyle()"
     :width="width"
-    :height="height"
-    :src="vidSrc">No video</video>
+    :height="height">
+    <source v-for="source of sources" v-bind:key="source.src" :src="source.src" :type="source.type" />
+    No video</video>
   </div>
 </template>
 
 <script>
 import vid from '../assets/cat.webm'
+import vid2 from '../assets/cat.mp4'
 import Board from '../board.ts'
 import Vue from 'vue'
 import posterSrc from '../assets/robot.jpg'
@@ -72,7 +74,13 @@ export default {
       hamming: null,
       width: 0,
       height: 0,
-      vidSrc: vid,
+      sources: [{
+        src: vid,
+        type: 'video/webm'
+      }, {
+        src: vid2,
+        type: 'video/mp4'
+      }],
       targetSrc: this.src,
       posterSrc: posterSrc,
       dx: this.board.dx,
