@@ -17,6 +17,7 @@
     <video ref="sourceImg"
     autoplay
     loop
+    playsinline
     muted="true"
     :style="getSourceStyle()"
     :width="width"
