@@ -21,11 +21,11 @@ describe('board', () => {
   })
   it('should return row and col', () => {
     assert.equal(board.col(1), 1)
-    assert.equal(board.col(3), 3)
+    assert.equal(board.col(3), 0)
     assert.equal(board.col(4), 1)
-    assert.equal(board.row(1), 1)
+    assert.equal(board.row(1), 0)
     assert.equal(board.row(3), 1)
-    assert.equal(board.row(4), 2)
+    assert.equal(board.row(4), 1)
   })
   it('should return dimensions', () => {
     const d = board.dimensions()

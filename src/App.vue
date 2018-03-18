@@ -58,6 +58,7 @@ export default {
 html,body {
   margin: 0;
   padding: 0;
+  background-color: #F0F0F0;
 }
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
