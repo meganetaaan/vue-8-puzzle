@@ -67,6 +67,7 @@ export default {
   name: 'PuzzleBoard',
   data () {
     this._blockPositions = []
+    this._isStarted = false
     return {
       isTouchNeeded: true,
       blocks: this.board.blocks,
@@ -189,9 +190,11 @@ export default {
       requestAnimationFrame(loop)
     }
     this.$nextTick(loop)
+    this.$emit('init')
   },
   watch: {
     board () {
+      this.$emit('init')
       this.blocks = this.board.blocks
       this.dx = this.board.dx
       this.dy = this.board.dy
@@ -250,6 +253,10 @@ export default {
       }
     },
     slide (idx) {
+      if (!this._isStarted) {
+        this._isStarted = true
+        this.$emit('start')
+      }
       this.board.slide(idx)
       Vue.set(this, 'blocks', this.board.blocks.concat())
     },

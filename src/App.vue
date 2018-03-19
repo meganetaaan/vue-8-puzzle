@@ -18,6 +18,8 @@
       :src="imgSrc"
       :autoResize="autoResize"
       :showNumber="showNumber"
+      @init="onPuzzleBoardInit"
+      @start="onPuzzleBoardStart"
       @change="onPuzzleBoardChange"
       @finish="onPuzzleBoardFinish"
       />
@@ -44,10 +46,18 @@ export default {
     }
   },
   methods: {
+    onPuzzleBoardInit () {
+      console.log('init')
+    },
+    onPuzzleBoardStart () {
+      console.log('start')
+    },
     onPuzzleBoardFinish () {
+      console.log('finish')
       this.isGoal = true
     },
     onPuzzleBoardChange (payload) {
+      console.log('change')
       this.distance = payload.distance
     }
   }
