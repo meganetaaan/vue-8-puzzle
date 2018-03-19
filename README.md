@@ -1,11 +1,11 @@
 Vue-8-puzzle
 ===
 
-An itty-bitty 8-puzzle game made as Vue.js component
+An itty-bitty video-moving 8-puzzle game made as Vue.js component
 
 [PLAY DEMO](https://meganetaaan.github.io/vue-8-puzzle/)
 
-![maze-vue](doc/maze-vue.png)
+![8-puzzle](doc/8-puzzle.png)
 
 ## Install
 
