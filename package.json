@@ -1,9 +1,8 @@
 {
   "name": "vue-8-puzzle",
-  "version": "0.0.1",
-  "description": "A Vue.js project",
+  "version": "0.1.0",
+  "description": "A Vue.js component of a simple slide puzzle game",
   "author": "Shinya Ishikawa <ishikawa.s.1027@gmail.com>",
-  "private": true,
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "npm run dev",
@@ -11,18 +10,28 @@
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit",
     "build": "node build/build.js",
+    "prepublish": "npm run build",
     "deploy": "npm run build; gh-pages -d dist"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/meganetaaan/vue-8-puzzle.git"
+  },
+  "keywords": ["vue", "game", "component"],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meganetaaan/vue-8-puzzle/issues"
+  },
+  "homepage": "https://github.com/meganetaaan/vue-8-puzzle#readme",
   "dependencies": {
-    "@types/jest": "^22.1.3",
-    "jsgif": "^1.0.2",
     "lodash.debounce": "^4.0.8",
-    "ts-jest": "^22.4.0",
-    "ts-loader": "^3",
     "tween.js": "^16.6.0",
     "vue": "^2.5.2"
   },
   "devDependencies": {
+    "@types/jest": "^22.1.3",
+    "ts-jest": "^22.4.0",
+    "ts-loader": "^3",
     "@types/power-assert": "^1.4.29",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.22.1",
