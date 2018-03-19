@@ -1,27 +1,50 @@
-# vue-8-puzzle
+Vue-8-puzzle
+===
 
-> A Vue.js project
+An itty-bitty 8-puzzle game made as Vue.js component
 
-## Build Setup
+[PLAY DEMO](https://meganetaaan.github.io/vue-8-puzzle/)
 
-``` bash
-# install dependencies
-npm install
+![maze-vue](doc/maze-vue.png)
 
-# serve with hot reload at localhost:8080
-npm run dev
+## Install
 
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
+```bash
+$ npm install vue-8-puzzle --save
 ```
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+```JavaScript
+import Vue from 'vue'
+import PuzzleBoard from 'vue-8-puzzle'
+import videoSrc from 'myvideo.webm'
+
+let v = new Vue({
+  el: '#app',
+  template: `
+    <app>
+      <puzzle-board
+      :src="videoSrc" />
+    </app>`,
+  components: {
+    PuzzleBoard
+  }
+})
+```
+
+## Props
+
+Props      | Type   | Description                  | Default
+-----------|--------|------------------------------|--------------------------------
+src | string | source path(required) |
+board | Array<Array<number>> | A 2d array of tile number | random 3 x 3 array
+autoResize | boolean | when true the component fits to its root automatically | false
+showNumber | boolean | when true the component shows tile numbers on the video | true
+
+## Events
+
+Event    | Payload | Description
+---------|---------|------------------------------------
+init     | none    | the puzzle is initialized
+start    | none    | the tile start to move
+change   | none    | the tile changes
+finish   | none    | all the tile is on correct position
