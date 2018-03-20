@@ -35,7 +35,7 @@ let v = new Vue({
 
 Props      | Type   | Description                  | Default
 -----------|--------|------------------------------|--------------------------------
-src | string | source path(required) |
+sources | Array<Object> | source paths | default video
 board | Array<Array<number>> | A 2d array of tile number | random 3 x 3 array
 autoResize | boolean | when true the component fits to its root automatically | false
 showNumber | boolean | when true the component shows tile numbers on the video | true

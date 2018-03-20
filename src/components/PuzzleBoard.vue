@@ -62,13 +62,6 @@ export default {
       hamming: null,
       width: 0,
       height: 0,
-      sources: [{
-        src: vid,
-        type: 'video/webm'
-      }, {
-        src: vid2,
-        type: 'video/mp4'
-      }],
       targetSrc: this.src,
       posterSrc: posterSrc,
       dx: this.board.dx,
@@ -95,8 +88,14 @@ export default {
         return board
       }
     },
-    src: {
-      type: String
+    sources: {
+      default: [{
+        src: vid,
+        type: 'video/webm'
+      }, {
+        src: vid2,
+        type: 'video/mp4'
+      }]
     },
     showNumber: {
       type: Boolean,
