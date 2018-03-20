@@ -89,13 +89,15 @@ export default {
       }
     },
     sources: {
-      default: [{
-        src: vid,
-        type: 'video/webm'
-      }, {
-        src: vid2,
-        type: 'video/mp4'
-      }]
+      default: () => {
+        return [{
+          src: vid,
+          type: 'video/webm'
+        }, {
+          src: vid2,
+          type: 'video/mp4'
+        }]
+      }
     },
     showNumber: {
       type: Boolean,
@@ -120,10 +122,6 @@ export default {
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     this._lastRender = -1
     this.$refs.sourceImg.addEventListener('play', () => {
-      const ctx = this.$refs['puzzle-canvas'].getContext('2d')
-      ctx.font = "24px 'Avenir', Helvetica, Arial, sans-serif"
-      ctx.fillStyle = '#fafafa'
-      ctx.textBaseline = 'top'
       this.isTouchNeeded = false
     })
     const loop = () => {
@@ -158,6 +156,9 @@ export default {
         }
 
         // number
+        ctx.font = "24px 'Avenir', Helvetica, Arial, sans-serif"
+        ctx.fillStyle = '#fafafa'
+        ctx.textBaseline = 'top'
         if (this.showNumber) {
           for (let i = 0, len = this.blocks.length; i < len; i++) {
             const r = Math.floor(i / this.dx)
@@ -291,6 +292,7 @@ export default {
         this.width = w
         this.height = h
       }
+      this.updateBlockPositions()
     },
     onKeyUp (event) {
       const bp = this.board.blankpos
