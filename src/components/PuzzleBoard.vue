@@ -36,27 +36,13 @@ import posterSrc from '../assets/robot.jpg'
 import debounce from 'lodash.debounce'
 import TWEEN from 'tween.js'
 
-const shuffle = (arr) => {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const r = Math.floor(Math.random() * (i + 1))
-    let tmp = arr[i]
-    arr[i] = arr[r]
-    arr[r] = tmp
-  }
-  return arr
-}
 const createBoard2D = (dx, dy) => {
-  const len = dx * dy
-  const arr = []
-  for (let i = 0; i < len; i++) {
-    arr.push(i)
-  }
-  shuffle(arr)
   const result = []
+  let n = 0
   for (let i = 0; i < dy; i++) {
     const sub = []
     for (let j = 0; j < dx; j++) {
-      sub.push(arr[dx * i + j])
+      sub.push(++n % (dx * dy))
     }
     result.push(sub)
   }
@@ -94,7 +80,19 @@ export default {
       type: Board,
       default: () => {
         const board2D = createBoard2D(3, 3)
-        return new Board(board2D)
+        // TODO: Refactoring
+        const board = new Board(board2D)
+        const methodNames = ['swapAbove', 'swapLeft', 'swapRight', 'swapBelow']
+        const len = methodNames.length
+        for (let i = 0; i < 100; i++) {
+          const methodName = methodNames[Math.floor(Math.random() * len)]
+          try {
+            board[methodName](board.blankpos)
+          } catch (e) {
+            continue
+          }
+        }
+        return board
       }
     },
     src: {
@@ -155,8 +153,13 @@ export default {
         // copies clipped video source to canvas for sync drawing
         ctx.drawImage(sourceImg, marginX, marginY, sourceWidth, sourceHeight, w, 0, w, h)
 
+        if (this.isGoal) {
+          requestAnimationFrame(loop)
+          return
+        }
+
         // number
-        if (!this.isGoal && this.showNumber) {
+        if (this.showNumber) {
           for (let i = 0, len = this.blocks.length; i < len; i++) {
             const r = Math.floor(i / this.dx)
             const c = i % this.dx
