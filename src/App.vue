@@ -8,6 +8,13 @@
         <input type="checkbox" id="showNumber" v-model="showNumber" />
       </span>
       <span class="header-item">
+        <select v-model="difficulty">
+          <option>Easy</option>
+          <option>Normal</option>
+          <option>Difficult</option>
+        </select>
+      </span>
+      <span class="header-item">
         <template v-if="isGoal">
           finish!!
         </template>
@@ -18,6 +25,8 @@
       :src="imgSrc"
       :autoResize="autoResize"
       :showNumber="showNumber"
+      :dx="dimensions.x"
+      :dy="dimensions.y"
       @init="onPuzzleBoardInit"
       @start="onPuzzleBoardStart"
       @change="onPuzzleBoardChange"
@@ -31,6 +40,11 @@
 import PuzzleBoard from './components/PuzzleBoard'
 import imgSrc from './assets/robot.jpg'
 
+const DIMENSIONS = {
+  Easy: {x: 3, y: 3},
+  Normal: {x: 4, y: 4},
+  Difficult: {x: 5, y: 5}
+}
 export default {
   name: 'App',
   components: {
@@ -38,11 +52,17 @@ export default {
   },
   data () {
     return {
+      difficulty: 'Easy',
       imgSrc,
       distance: null,
       isGoal: false,
       autoResize: true,
       showNumber: false
+    }
+  },
+  computed: {
+    dimensions () {
+      return DIMENSIONS[this.difficulty]
     }
   },
   methods: {

@@ -49,14 +49,32 @@ const createBoard2D = (dx, dy) => {
   return result
 }
 
+const createRandomBoard2D = (dx, dy) => {
+  const board2D = createBoard2D(dx, dy)
+  // TODO: Refactoring
+  const board = new Board(board2D)
+  const methodNames = ['swapAbove', 'swapLeft', 'swapRight', 'swapBelow']
+  const len = methodNames.length
+  for (let i = 0; i < 100; i++) {
+    const methodName = methodNames[Math.floor(Math.random() * len)]
+    try {
+      board[methodName](board.blankpos)
+    } catch (e) {
+      continue
+    }
+  }
+  return board
+}
+
 export default {
   name: 'PuzzleBoard',
   data () {
     this._blockPositions = []
     this._isStarted = false
+    const board = createRandomBoard2D(this.dx, this.dy)
     return {
       isTouchNeeded: true,
-      blocks: this.board.blocks,
+      blocks: board.blocks,
       isGoal: false,
       manhattan: null,
       hamming: null,
@@ -64,29 +82,17 @@ export default {
       height: 0,
       targetSrc: this.src,
       posterSrc: posterSrc,
-      dx: this.board.dx,
-      dy: this.board.dx
+      board: board
     }
   },
   props: {
-    board: {
-      type: Board,
-      default: () => {
-        const board2D = createBoard2D(3, 3)
-        // TODO: Refactoring
-        const board = new Board(board2D)
-        const methodNames = ['swapAbove', 'swapLeft', 'swapRight', 'swapBelow']
-        const len = methodNames.length
-        for (let i = 0; i < 100; i++) {
-          const methodName = methodNames[Math.floor(Math.random() * len)]
-          try {
-            board[methodName](board.blankpos)
-          } catch (e) {
-            continue
-          }
-        }
-        return board
-      }
+    dx: {
+      type: Number,
+      default: 4
+    },
+    dy: {
+      type: Number,
+      default: 4
     },
     sources: {
       default: () => {
@@ -196,11 +202,14 @@ export default {
     this.$emit('init')
   },
   watch: {
+    dx () {
+      this.initBoard()
+    },
+    dy () {
+      this.initBoard()
+    },
     board () {
-      this.$emit('init')
       this.blocks = this.board.blocks
-      this.dx = this.board.dx
-      this.dy = this.board.dy
     },
     blocks () {
       this.updateBlockPositions()
@@ -220,7 +229,12 @@ export default {
     }
   },
   methods: {
-    updateBlockPositions () {
+    initBoard () {
+      this.board = createRandomBoard2D(this.dx, this.dy)
+      this._isStarted = false
+      this.$emit('init')
+    },
+    updateBlockPositions (isImmediate) {
       for (let i = 0, len = this.blocks.length; i < len; i++) {
         const b = this.blocks[i]
         const col = this.board.col(i)
@@ -235,14 +249,19 @@ export default {
           continue
         }
         const obj = {x: from.x, y: from.y}
-        new TWEEN.Tween(obj)
-          .to({x, y}, 200)
-          .easing(TWEEN.Easing.Quadratic.Out)
-          .onUpdate(() => {
-            this._blockPositions[b].x = obj.x
-            this._blockPositions[b].y = obj.y
-          })
-          .start()
+        if (isImmediate) {
+          this._blockPositions[b].x = x
+          this._blockPositions[b].y = y
+        } else {
+          new TWEEN.Tween(obj)
+            .to({x, y}, 200)
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .onUpdate(() => {
+              this._blockPositions[b].x = obj.x
+              this._blockPositions[b].y = obj.y
+            })
+            .start()
+        }
       }
     },
     getCanvasStyle () {
@@ -292,7 +311,7 @@ export default {
         this.width = w
         this.height = h
       }
-      this.updateBlockPositions()
+      this.updateBlockPositions(true)
     },
     onKeyUp (event) {
       const bp = this.board.blankpos
