@@ -121,6 +121,8 @@ export default {
     this.onResize()
     this.updateBlockPositions(!this.animation)
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
+    this._tmpCanvas = document.createElement('canvas')
+    this._tmpCtx = this._tmpCanvas.getContext('2d')
     this._lastRenderVideoTime = -1
     this._lastRenderTime = 0
     this.$refs.sourceImg.addEventListener('play', () => {
@@ -128,7 +130,7 @@ export default {
     })
     const loop = () => {
       TWEEN.update()
-      if (this.$refs.sourceImg == null) {
+      if (this.$refs.sourceImg == null || this.$refs.sourceImg.readyState < 3) {
         requestAnimationFrame(loop)
         return
       }
@@ -137,22 +139,31 @@ export default {
       if (sourceImg.currentTime !== this._lastRender && now - this._lastRenderTime > (1000 / this.fps)) {
         this._lastRenderVideoTime = sourceImg.currentTime
         this._lastRenderTime = now
+
         // TODO: choose trimming strategy
         // trims square area from the center of the source
-        const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
-        const marginX = (sourceImg.videoWidth - sourceCellSize * this.dx) / 2
-        const marginY = (sourceImg.videoHeight - sourceCellSize * this.dy) / 2
         const canvas = this.$refs['puzzle-canvas']
-        const ctx = canvas.getContext('2d')
-        const sourceWidth = sourceCellSize * this.dx
-        const sourceHeight = sourceCellSize * this.dy
+        let ctx = canvas.getContext('2d')
         const w = this.width
         const h = this.height
+
+        const vw = sourceImg.videoWidth
+        const vh = sourceImg.videoHeight
+        const ratio = Math.max(w / vw, h / vh)
+
+        // NOTE: iOS11 has a memory leak on canvas.drawImage with 9 args
+        // if the image is scaled.
+        // to prevent them I have to use 5 args version for scaling
+        this._tmpCanvas.width = vw * ratio
+        this._tmpCanvas.height = vh * ratio
+        this._tmpCtx.drawImage(sourceImg, 0, 0, vw * ratio, vh * ratio)
 
         ctx.clearRect(0, 0, this.width, this.height)
 
         // copies clipped video source to canvas for sync drawing
-        ctx.drawImage(sourceImg, marginX, marginY, sourceWidth, sourceHeight, w, 0, w, h)
+        const marginX = (vw * ratio - w) / 2
+        const marginY = (vh * ratio - h) / 2
+        ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
 
         if (this.isGoal) {
           requestAnimationFrame(loop)
