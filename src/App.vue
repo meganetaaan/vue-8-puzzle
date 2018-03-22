@@ -12,6 +12,13 @@
         <input type="checkbox" id="animation" v-model="animation" />
       </span>
       <span class="header-item">
+        <select v-model="quality">
+          <option>Low</option>
+          <option>Middle</option>
+          <option>High</option>
+        </select>
+      </span>
+      <span class="header-item">
         <select v-model="difficulty">
           <option>Easy</option>
           <option>Normal</option>
@@ -33,6 +40,7 @@
       :dy="dimensions.y"
       :sources="sources"
       :animation="animation"
+      :fps="fps"
       @init="onPuzzleBoardInit"
       @start="onPuzzleBoardStart"
       @change="onPuzzleBoardChange"
@@ -52,6 +60,11 @@ const DIMENSIONS = {
   Normal: {x: 4, y: 4},
   Difficult: {x: 5, y: 5}
 }
+const FPS = {
+  Low: 5,
+  Middle: 20,
+  High: 30
+}
 export default {
   name: 'App',
   components: {
@@ -60,6 +73,7 @@ export default {
   data () {
     return {
       difficulty: 'Easy',
+      quality: 'Middle',
       imgSrc,
       distance: null,
       isGoal: false,
@@ -75,6 +89,9 @@ export default {
   computed: {
     dimensions () {
       return DIMENSIONS[this.difficulty]
+    },
+    fps () {
+      return FPS[this.quality]
     }
   },
   methods: {

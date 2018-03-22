@@ -69,7 +69,6 @@ export default {
   data () {
     this._blockPositions = []
     this._isStarted = false
-    this._fps = 30
     const board = createRandomBoard2D(this.dx, this.dy)
     return {
       isTouchNeeded: true,
@@ -107,6 +106,10 @@ export default {
     autoResize: {
       type: Boolean,
       default: false
+    },
+    fps: {
+      type: Number,
+      default: 30
     }
   },
   computed: {
@@ -134,7 +137,7 @@ export default {
       }
       const sourceImg = this.$refs.sourceImg
       const now = Date.now()
-      if (sourceImg.currentTime !== this._lastRender/* && now - this._lastRenderTime > 1000 / this._maxFps */) {
+      if (sourceImg.currentTime !== this._lastRender && now - this._lastRenderTime > (1000 / this.fps)) {
         this._lastRenderVideoTime = sourceImg.currentTime
         this._lastRenderTime = now
         // TODO: choose trimming strategy
