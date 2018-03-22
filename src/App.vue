@@ -2,10 +2,14 @@
   <div id="app">
     <div class="header">
       <span class="header-item title">Vue-8-Puzzle</span>
-      <span class="header-item distance"> Distance: {{distance}} </span>
+      <span class="header-item distance"> d: {{distance}} </span>
       <span class="header-item">
-        <label for="showNumber">Show Number:</label>
+        <label for="showNumber">#:</label>
         <input type="checkbox" id="showNumber" v-model="showNumber" />
+      </span>
+      <span class="header-item">
+        <label for="animation">a:</label>
+        <input type="checkbox" id="animation" v-model="animation" />
       </span>
       <span class="header-item">
         <select v-model="difficulty">
@@ -27,6 +31,8 @@
       :showNumber="showNumber"
       :dx="dimensions.x"
       :dy="dimensions.y"
+      :sources="sources"
+      :animation="animation"
       @init="onPuzzleBoardInit"
       @start="onPuzzleBoardStart"
       @change="onPuzzleBoardChange"
@@ -39,6 +45,7 @@
 <script>
 import PuzzleBoard from './components/PuzzleBoard'
 import imgSrc from './assets/robot.jpg'
+import vid2 from './assets/cat.mp4'
 
 const DIMENSIONS = {
   Easy: {x: 3, y: 3},
@@ -57,7 +64,12 @@ export default {
       distance: null,
       isGoal: false,
       autoResize: true,
-      showNumber: false
+      showNumber: false,
+      animation: false,
+      sources: [{
+        src: vid2,
+        type: 'video/mp4'
+      }]
     }
   },
   computed: {

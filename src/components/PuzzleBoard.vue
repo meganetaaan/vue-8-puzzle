@@ -28,8 +28,6 @@
 </template>
 
 <script>
-import vid from '../assets/cat.webm'
-import vid2 from '../assets/cat.mp4'
 import Board from '../board.ts'
 import Vue from 'vue'
 import posterSrc from '../assets/robot.jpg'
@@ -71,6 +69,7 @@ export default {
   data () {
     this._blockPositions = []
     this._isStarted = false
+    this._fps = 30
     const board = createRandomBoard2D(this.dx, this.dy)
     return {
       isTouchNeeded: true,
@@ -86,6 +85,10 @@ export default {
     }
   },
   props: {
+    animation: {
+      type: Boolean,
+      default: true
+    },
     dx: {
       type: Number,
       default: 4
@@ -95,15 +98,7 @@ export default {
       default: 4
     },
     sources: {
-      default: () => {
-        return [{
-          src: vid,
-          type: 'video/webm'
-        }, {
-          src: vid2,
-          type: 'video/mp4'
-        }]
-      }
+      required: true
     },
     showNumber: {
       type: Boolean,
@@ -124,9 +119,10 @@ export default {
   },
   mounted () {
     this.onResize()
-    this.updateBlockPositions()
+    this.updateBlockPositions(!this.animation)
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
-    this._lastRender = -1
+    this._lastRenderVideoTime = -1
+    this._lastRenderTime = 0
     this.$refs.sourceImg.addEventListener('play', () => {
       this.isTouchNeeded = false
     })
@@ -137,8 +133,10 @@ export default {
         return
       }
       const sourceImg = this.$refs.sourceImg
-      if (sourceImg.currentTime !== this._lastRender) {
-        this._lastRender = sourceImg.currentTime
+      const now = Date.now()
+      if (sourceImg.currentTime !== this._lastRender/* && now - this._lastRenderTime > 1000 / this._maxFps */) {
+        this._lastRenderVideoTime = sourceImg.currentTime
+        this._lastRenderTime = now
         // TODO: choose trimming strategy
         // trims square area from the center of the source
         const sourceCellSize = Math.min(sourceImg.videoWidth / this.dx, sourceImg.videoHeight / this.dy)
@@ -212,7 +210,7 @@ export default {
       this.blocks = this.board.blocks
     },
     blocks () {
-      this.updateBlockPositions()
+      this.updateBlockPositions(!this.animation)
       this.isGoal = this.board.isGoal()
       this.manhattan = this.board.manhattan()
       this.hamming = this.board.hamming()
