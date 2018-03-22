@@ -33,7 +33,6 @@
     </div>
     <div class="container">
       <puzzle-board
-      :src="imgSrc"
       :autoResize="autoResize"
       :showNumber="showNumber"
       :dx="dimensions.x"
@@ -52,7 +51,6 @@
 
 <script>
 import PuzzleBoard from './components/PuzzleBoard'
-import imgSrc from './assets/robot.jpg'
 import vid2 from './assets/cat.mp4'
 
 const DIMENSIONS = {
@@ -74,7 +72,6 @@ export default {
     return {
       difficulty: 'Easy',
       quality: 'Middle',
-      imgSrc,
       distance: null,
       isGoal: false,
       autoResize: true,

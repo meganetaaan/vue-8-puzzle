@@ -30,7 +30,6 @@
 <script>
 import Board from '../board.ts'
 import Vue from 'vue'
-import posterSrc from '../assets/robot.jpg'
 import debounce from 'lodash.debounce'
 import TWEEN from 'tween.js'
 
@@ -78,8 +77,6 @@ export default {
       hamming: null,
       width: 0,
       height: 0,
-      targetSrc: this.src,
-      posterSrc: posterSrc,
       board: board
     }
   },
