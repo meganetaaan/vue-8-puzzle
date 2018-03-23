@@ -18,7 +18,8 @@
     autoplay
     loop
     playsinline
-    muted="true"
+    :muted="muted"
+    :src="src"
     :style="getSourceStyle()"
     :width="width"
     :height="height">
@@ -81,6 +82,13 @@ export default {
     }
   },
   props: {
+    src: {
+      type: String
+    },
+    muted: {
+      type: Boolean,
+      default: true
+    },
     animation: {
       type: Boolean,
       default: true
@@ -235,6 +243,11 @@ export default {
       if (this.isGoal) {
         this.$emit('finish')
       }
+    },
+    sources () {
+      this.$refs.sourceImg.load()
+      this.isTouchNeeded = true
+      this.$refs.sourceImg.play()
     }
   },
   methods: {
@@ -294,7 +307,6 @@ export default {
     onTouchEnd (event) {
       if (this.isTouchNeeded) {
         this.$refs.sourceImg.play()
-        this.isTouchNeeded = false
       }
       const touch = event.changedTouches[0]
       const rect = this.$el.getBoundingClientRect()

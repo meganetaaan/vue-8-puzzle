@@ -12,10 +12,9 @@
         <input type="checkbox" id="animation" v-model="animation" />
       </span>
       <span class="header-item">
-        <select v-model="quality">
-          <option>Low</option>
-          <option>Middle</option>
-          <option>High</option>
+        <select v-model="videoTitle">
+          <option>Cat</option>
+          <option>Penguin</option>
         </select>
       </span>
       <span class="header-item">
@@ -37,7 +36,7 @@
       :showNumber="showNumber"
       :dx="dimensions.x"
       :dy="dimensions.y"
-      :sources="sources"
+      :sources="sourcePath"
       :animation="animation"
       :fps="fps"
       @init="onPuzzleBoardInit"
@@ -51,8 +50,27 @@
 
 <script>
 import PuzzleBoard from './components/PuzzleBoard'
-import vid2 from './assets/cat.mp4'
+import penguinwebm from './assets/penguin.webm'
+import penguinmp4 from './assets/penguin.mp4'
+import catwebm from './assets/cat.webm'
+import catmp4 from './assets/cat.mp4'
 
+const SOURCEPATHS = {
+  Cat: [{
+    src: catwebm,
+    type: 'video/webm'
+  }, {
+    src: catmp4,
+    type: 'video/mp4'
+  }],
+  Penguin: [{
+    src: penguinwebm,
+    type: 'video/webm'
+  }, {
+    src: penguinmp4,
+    type: 'video/mp4'
+  }]
+}
 const DIMENSIONS = {
   Easy: {x: 3, y: 3},
   Normal: {x: 4, y: 4},
@@ -70,20 +88,20 @@ export default {
   },
   data () {
     return {
+      videoTitle: 'Cat',
       difficulty: 'Easy',
       quality: 'Middle',
       distance: null,
       isGoal: false,
       autoResize: true,
       showNumber: false,
-      animation: false,
-      sources: [{
-        src: vid2,
-        type: 'video/mp4'
-      }]
+      animation: true
     }
   },
   computed: {
+    sourcePath () {
+      return SOURCEPATHS[this.videoTitle]
+    },
     dimensions () {
       return DIMENSIONS[this.difficulty]
     },
