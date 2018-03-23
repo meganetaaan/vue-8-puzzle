@@ -38,7 +38,6 @@
       :dy="dimensions.y"
       :sources="sourcePath"
       :animation="animation"
-      :fps="fps"
       @init="onPuzzleBoardInit"
       @start="onPuzzleBoardStart"
       @change="onPuzzleBoardChange"
@@ -76,11 +75,6 @@ const DIMENSIONS = {
   Normal: {x: 4, y: 4},
   Difficult: {x: 5, y: 5}
 }
-const FPS = {
-  Low: 5,
-  Middle: 20,
-  High: 30
-}
 export default {
   name: 'App',
   components: {
@@ -90,7 +84,6 @@ export default {
     return {
       videoTitle: 'Cat',
       difficulty: 'Easy',
-      quality: 'Middle',
       distance: null,
       isGoal: false,
       autoResize: true,
@@ -104,9 +97,6 @@ export default {
     },
     dimensions () {
       return DIMENSIONS[this.difficulty]
-    },
-    fps () {
-      return FPS[this.quality]
     }
   },
   methods: {
