@@ -103,10 +103,6 @@ export default {
     autoResize: {
       type: Boolean,
       default: false
-    },
-    fps: {
-      type: Number,
-      default: 30
     }
   },
   computed: {
@@ -135,17 +131,17 @@ export default {
         return
       }
       const sourceImg = this.$refs.sourceImg
-      const now = Date.now()
-      if (sourceImg.currentTime !== this._lastRender && now - this._lastRenderTime > (1000 / this.fps)) {
+      const canvas = this.$refs['puzzle-canvas']
+      const ctx = canvas.getContext('2d')
+      const w = this.width
+      const h = this.height
+
+      // copy from video
+      if (sourceImg.currentTime !== this._lastRender) {
         this._lastRenderVideoTime = sourceImg.currentTime
-        this._lastRenderTime = now
 
         // TODO: choose trimming strategy
         // trims square area from the center of the source
-        const canvas = this.$refs['puzzle-canvas']
-        let ctx = canvas.getContext('2d')
-        const w = this.width
-        const h = this.height
 
         const vw = sourceImg.videoWidth
         const vh = sourceImg.videoHeight
@@ -158,52 +154,53 @@ export default {
         this._tmpCanvas.height = vh * ratio
         this._tmpCtx.drawImage(sourceImg, 0, 0, vw * ratio, vh * ratio)
 
-        ctx.clearRect(0, 0, this.width, this.height)
-
         // copies clipped video source to canvas for sync drawing
         const marginX = (vw * ratio - w) / 2
         const marginY = (vh * ratio - h) / 2
         ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
+      }
 
-        if (this.isGoal) {
-          requestAnimationFrame(loop)
-          return
-        }
+      if (this.isGoal) {
+        requestAnimationFrame(loop)
+        return
+      }
 
-        // number
+      // main render
+      ctx.clearRect(0, 0, this.width, this.height)
+
+      // number
+      if (this.showNumber) {
         ctx.font = "24px 'Avenir', Helvetica, Arial, sans-serif"
         ctx.fillStyle = '#fafafa'
         ctx.textBaseline = 'top'
-        if (this.showNumber) {
-          for (let i = 0, len = this.blocks.length; i < len; i++) {
-            const r = Math.floor(i / this.dx)
-            const c = i % this.dx
-            const text = String(i + 1)
-            const margin = 5
-            ctx.strokeText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
-            ctx.fillText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
-          }
-        }
-
         for (let i = 0, len = this.blocks.length; i < len; i++) {
-          const block = this.blocks[i]
-          if (block === 0) {
-            continue
-          }
-          const row = this.board.row(block - 1)
-          const col = this.board.col(block - 1)
-          const sourceX = this.cellWidth * col + w
-          const sourceY = this.cellHeight * row
-          const pos = this._blockPositions[block]
-          if (pos == null) {
-            continue
-          }
-          const targetX = pos.x
-          const targetY = pos.y
-          ctx.drawImage(canvas,
-            sourceX, sourceY, this.cellWidth, this.cellHeight,
-            targetX, targetY, this.cellWidth, this.cellHeight)
+          const r = Math.floor(i / this.dx)
+          const c = i % this.dx
+          const text = String(i + 1)
+          const margin = 5
+          ctx.strokeText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
+          ctx.fillText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
         }
+      }
+
+      for (let i = 0, len = this.blocks.length; i < len; i++) {
+        const block = this.blocks[i]
+        if (block === 0) {
+          continue
+        }
+        const row = this.board.row(block - 1)
+        const col = this.board.col(block - 1)
+        const sourceX = this.cellWidth * col + w
+        const sourceY = this.cellHeight * row
+        const pos = this._blockPositions[block]
+        if (pos == null) {
+          continue
+        }
+        const targetX = pos.x
+        const targetY = pos.y
+        ctx.drawImage(canvas,
+          sourceX, sourceY, this.cellWidth, this.cellHeight,
+          targetX, targetY, this.cellWidth, this.cellHeight)
       }
       requestAnimationFrame(loop)
     }

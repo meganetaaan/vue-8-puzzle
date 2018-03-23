@@ -12,13 +12,6 @@
         <input type="checkbox" id="animation" v-model="animation" />
       </span>
       <span class="header-item">
-        <select v-model="quality">
-          <option>Low</option>
-          <option>Middle</option>
-          <option>High</option>
-        </select>
-      </span>
-      <span class="header-item">
         <select v-model="difficulty">
           <option>Easy</option>
           <option>Normal</option>
@@ -39,7 +32,6 @@
       :dy="dimensions.y"
       :sources="sources"
       :animation="animation"
-      :fps="fps"
       @init="onPuzzleBoardInit"
       @start="onPuzzleBoardStart"
       @change="onPuzzleBoardChange"
@@ -51,17 +43,13 @@
 
 <script>
 import PuzzleBoard from './components/PuzzleBoard'
+import vid from './assets/cat.webm'
 import vid2 from './assets/cat.mp4'
 
 const DIMENSIONS = {
   Easy: {x: 3, y: 3},
   Normal: {x: 4, y: 4},
   Difficult: {x: 5, y: 5}
-}
-const FPS = {
-  Low: 5,
-  Middle: 20,
-  High: 30
 }
 export default {
   name: 'App',
@@ -71,13 +59,15 @@ export default {
   data () {
     return {
       difficulty: 'Easy',
-      quality: 'Middle',
       distance: null,
       isGoal: false,
       autoResize: true,
       showNumber: false,
       animation: false,
       sources: [{
+        src: vid,
+        type: 'video/webm'
+      }, {
         src: vid2,
         type: 'video/mp4'
       }]
@@ -86,9 +76,6 @@ export default {
   computed: {
     dimensions () {
       return DIMENSIONS[this.difficulty]
-    },
-    fps () {
-      return FPS[this.quality]
     }
   },
   methods: {
