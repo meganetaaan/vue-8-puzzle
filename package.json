@@ -1,7 +1,8 @@
 {
   "name": "vue-8-puzzle",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "A Vue.js component of a simple slide puzzle game",
+  "main": "lib/main.js",
   "author": "Shinya Ishikawa <ishikawa.s.1027@gmail.com>",
   "scripts": {
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
@@ -10,7 +11,8 @@
     "test": "npm run unit",
     "lint": "eslint --ext .js,.vue src test/unit",
     "build": "node build/build.js",
-    "prepublish": "npm run build",
+    "buildLibrary": "NODE_ENV=production webpack --config build/webpack.lib.conf.js",
+    "prepublish": "npm run buildLibrary",
     "deploy": "npm run build; gh-pages -d dist"
   },
   "repository": {

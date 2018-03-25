@@ -48,7 +48,8 @@
 </template>
 
 <script>
-import PuzzleBoard from './components/PuzzleBoard'
+// import PuzzleBoard from './components/PuzzleBoard'
+import PuzzleBoard from '../lib/main.js'
 import penguinwebm from './assets/penguin.webm'
 import penguinmp4 from './assets/penguin.mp4'
 import catwebm from './assets/cat.webm'

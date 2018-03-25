@@ -35,7 +35,8 @@ let v = new Vue({
 
 Props      | Type   | Description                  | Default
 -----------|--------|------------------------------|--------------------------------
-sources | Array<Object> | source paths | default video
+src | String | source path | -
+sources | Array<Object> | source paths | -
 dx         | number  | number of columns
 dy         | number  | number of rows
 autoResize | boolean | when true the component fits to its root automatically | false

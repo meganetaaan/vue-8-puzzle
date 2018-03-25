@@ -1,0 +1,8 @@
+src/
+build/
+config/
+design/
+dist/
+doc/
+static/
+test/
