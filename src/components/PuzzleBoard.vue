@@ -371,8 +371,10 @@ export default {
       this.onClick(ev)
     },
     onClick (event) {
-      const col = Math.floor(event.offsetX / this.cellWidth)
-      const row = Math.floor(event.offsetY / this.cellHeight)
+      const x = (event.offsetX - (this.isGoal ? this.width : 0)) / this.cellWidth
+      const y = event.offsetY / this.cellHeight
+      const col = Math.floor(x)
+      const row = Math.floor(y)
       const idx = row * this.cols + col
       this.slide(idx)
     },
