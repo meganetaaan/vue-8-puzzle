@@ -35,8 +35,8 @@
       <puzzle-board
       :autoResize="autoResize"
       :showNumber="showNumber"
-      :dx="dimensions.x"
-      :dy="dimensions.y"
+      :cols="dimensions.x"
+      :rows="dimensions.y"
       :src="src"
       :sources="sources"
       :animation="animation"

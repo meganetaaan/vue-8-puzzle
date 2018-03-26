@@ -242,11 +242,15 @@ export default {
           this.$refs.sourceImg.load()
           this.isTouchNeeded = true
           this.$refs.sourceImg.play()
+          this.$refs.sourceImg.addEventListener('play', () => {
+            this.isTouchNeeded = false
+          })
         })
       }
     },
     src () {
       if (this.isImage) {
+        this.isTouchNeeded = false
         // add onLoadImage hook after the img element appears
         this.$nextTick(() => {
           this.$refs.sourceImg.addEventListener('load', () => {
