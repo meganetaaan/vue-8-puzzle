@@ -70,7 +70,7 @@ export default {
   data () {
     this._blockPositions = []
     this._isStarted = false
-    const board = createRandomBoard2D(this.dx, this.dy)
+    const board = createRandomBoard2D(this.cols, this.rows)
     return {
       isTouchNeeded: true,
       blocks: board.blocks,
@@ -97,11 +97,11 @@ export default {
       type: Boolean,
       default: true
     },
-    dx: {
+    cols: {
       type: Number,
       default: 4
     },
-    dy: {
+    rows: {
       type: Number,
       default: 4
     },
@@ -116,10 +116,10 @@ export default {
   },
   computed: {
     cellWidth () {
-      return this.width / this.dx
+      return this.width / this.cols
     },
     cellHeight () {
-      return this.height / this.dy
+      return this.height / this.rows
     },
     isImage () {
       return /\.(jpe?g|png|webm|gif)$/i.test(this.src)
@@ -210,10 +210,10 @@ export default {
     this.$emit('init')
   },
   watch: {
-    dx () {
+    cols () {
       this.initBoard()
     },
-    dy () {
+    rows () {
       this.initBoard()
     },
     board () {
@@ -262,7 +262,7 @@ export default {
   },
   methods: {
     initBoard () {
-      this.board = createRandomBoard2D(this.dx, this.dy)
+      this.board = createRandomBoard2D(this.cols, this.rows)
       this._isStarted = false
       this.$emit('init')
     },
@@ -373,7 +373,7 @@ export default {
     onClick (event) {
       const col = Math.floor(event.offsetX / this.cellWidth)
       const row = Math.floor(event.offsetY / this.cellHeight)
-      const idx = row * this.dx + col
+      const idx = row * this.cols + col
       this.slide(idx)
     },
     onClickBoard () {
@@ -398,8 +398,8 @@ export default {
           }
           break
         case 38:
-          if (bp + this.dx < len) {
-            this.slide(bp + this.dx)
+          if (bp + this.cols < len) {
+            this.slide(bp + this.cols)
           }
           break
         case 39:
@@ -408,8 +408,8 @@ export default {
           }
           break
         case 40:
-          if (bp - this.dx >= 0) {
-            this.slide(bp - this.dx)
+          if (bp - this.cols >= 0) {
+            this.slide(bp - this.cols)
           }
       }
     }

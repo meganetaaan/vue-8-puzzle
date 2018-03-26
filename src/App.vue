@@ -104,9 +104,7 @@ export default {
   },
   computed: {
     sources () {
-      const s = SOURCEPATHS[this.videoTitle].sources
-      console.log(s)
-      return s
+      return SOURCEPATHS[this.videoTitle].sources
     },
     src () {
       return SOURCEPATHS[this.videoTitle].src
