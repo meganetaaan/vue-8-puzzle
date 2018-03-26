@@ -14,7 +14,8 @@
     :width="width * 2"
     :height="height"
     ></canvas>
-    <video ref="sourceImg"
+    <img v-if="isImage" :style="getSourceStyle()" :src="src" ref="sourceImg"/>
+    <video v-else ref="sourceImg"
     autoplay
     loop
     playsinline
@@ -85,6 +86,9 @@ export default {
     src: {
       type: String
     },
+    sources: {
+      type: Array
+    },
     muted: {
       type: Boolean,
       default: true
@@ -101,9 +105,6 @@ export default {
       type: Number,
       default: 4
     },
-    sources: {
-      required: true
-    },
     showNumber: {
       type: Boolean,
       default: true
@@ -119,6 +120,9 @@ export default {
     },
     cellHeight () {
       return this.height / this.dy
+    },
+    isImage () {
+      return /\.(jpe?g|png|webm|gif)$/i.test(this.src)
     }
   },
   mounted () {
@@ -129,9 +133,16 @@ export default {
     this._tmpCtx = this._tmpCanvas.getContext('2d')
     this._lastRenderVideoTime = -1
     this._lastRenderTime = 0
-    this.$refs.sourceImg.addEventListener('play', () => {
-      this.isTouchNeeded = false
-    })
+    if (this.isImage) {
+      this.$refs.sourceImg.onload = () => {
+        this.isTouchNeeded = false
+        this._loadImageToCanvas()
+      }
+    } else {
+      this.$refs.sourceImg.addEventListener('play', () => {
+        this.isTouchNeeded = false
+      })
+    }
     const loop = () => {
       TWEEN.update()
       if (this.$refs.sourceImg == null || this.$refs.sourceImg.readyState < 3) {
@@ -142,7 +153,6 @@ export default {
       const canvas = this.$refs['puzzle-canvas']
       const ctx = canvas.getContext('2d')
       const w = this.width
-      const h = this.height
 
       // copy from video
       if (sourceImg.currentTime !== this._lastRender) {
@@ -151,21 +161,7 @@ export default {
         // TODO: choose trimming strategy
         // trims square area from the center of the source
 
-        const vw = sourceImg.videoWidth
-        const vh = sourceImg.videoHeight
-        const ratio = Math.max(w / vw, h / vh)
-
-        // NOTE: iOS11 has a memory leak on canvas.drawImage with 9 args
-        // if the image is scaled.
-        // to prevent them I have to use 5 args version for scaling
-        this._tmpCanvas.width = vw * ratio
-        this._tmpCanvas.height = vh * ratio
-        this._tmpCtx.drawImage(sourceImg, 0, 0, vw * ratio, vh * ratio)
-
-        // copies clipped video source to canvas for sync drawing
-        const marginX = (vw * ratio - w) / 2
-        const marginY = (vh * ratio - h) / 2
-        ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
+        this._loadVideoFrameToCanvas()
       }
 
       if (this.isGoal) {
@@ -181,14 +177,6 @@ export default {
         ctx.font = "24px 'Avenir', Helvetica, Arial, sans-serif"
         ctx.fillStyle = '#fafafa'
         ctx.textBaseline = 'top'
-        for (let i = 0, len = this.blocks.length; i < len; i++) {
-          const r = Math.floor(i / this.dx)
-          const c = i % this.dx
-          const text = String(i + 1)
-          const margin = 5
-          ctx.strokeText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
-          ctx.fillText(text, margin + w + this.cellWidth * c, margin + this.cellHeight * r)
-        }
       }
 
       for (let i = 0, len = this.blocks.length; i < len; i++) {
@@ -209,6 +197,12 @@ export default {
         ctx.drawImage(canvas,
           sourceX, sourceY, this.cellWidth, this.cellHeight,
           targetX, targetY, this.cellWidth, this.cellHeight)
+        if (this.showNumber) {
+          const text = String(block)
+          const margin = 5
+          ctx.strokeText(text, margin + targetX, margin + targetY)
+          ctx.fillText(text, margin + targetX, margin + targetY)
+        }
       }
       requestAnimationFrame(loop)
     }
@@ -242,9 +236,24 @@ export default {
       }
     },
     sources () {
-      this.$refs.sourceImg.load()
-      this.isTouchNeeded = true
-      this.$refs.sourceImg.play()
+      if (!this.isImage) {
+        // load and play video after the video element appears
+        this.$nextTick(() => {
+          this.$refs.sourceImg.load()
+          this.isTouchNeeded = true
+          this.$refs.sourceImg.play()
+        })
+      }
+    },
+    src () {
+      if (this.isImage) {
+        // add onLoadImage hook after the img element appears
+        this.$nextTick(() => {
+          this.$refs.sourceImg.addEventListener('load', () => {
+            this._loadImageToCanvas()
+          })
+        })
+      }
     }
   },
   methods: {
@@ -282,6 +291,50 @@ export default {
             .start()
         }
       }
+    },
+    _loadImageToCanvas () {
+      const sourceImg = this.$refs.sourceImg
+      const canvas = this.$refs['puzzle-canvas']
+      const ctx = canvas.getContext('2d')
+      const w = this.width
+      const h = this.height
+      const vw = sourceImg.width
+      const vh = sourceImg.height
+      const ratio = Math.max(w / vw, h / vh)
+
+      // NOTE: iOS11 has a memory leak on canvas.drawImage with 9 args
+      // if the image is scaled.
+      // to prevent them I have to use 5 args version for scaling
+      this._tmpCanvas.width = vw * ratio
+      this._tmpCanvas.height = vh * ratio
+      this._tmpCtx.drawImage(sourceImg, 0, 0, vw * ratio, vh * ratio)
+
+      // copies clipped video source to canvas for sync drawing
+      const marginX = (vw * ratio - w) / 2
+      const marginY = (vh * ratio - h) / 2
+      ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
+    },
+    _loadVideoFrameToCanvas () {
+      const sourceImg = this.$refs.sourceImg
+      const canvas = this.$refs['puzzle-canvas']
+      const ctx = canvas.getContext('2d')
+      const w = this.width
+      const h = this.height
+      const vw = sourceImg.videoWidth
+      const vh = sourceImg.videoHeight
+      const ratio = Math.max(w / vw, h / vh)
+
+      // NOTE: iOS11 has a memory leak on canvas.drawImage with 9 args
+      // if the image is scaled.
+      // to prevent them I have to use 5 args version for scaling
+      this._tmpCanvas.width = vw * ratio
+      this._tmpCanvas.height = vh * ratio
+      this._tmpCtx.drawImage(sourceImg, 0, 0, vw * ratio, vh * ratio)
+
+      // copies clipped video source to canvas for sync drawing
+      const marginX = (vw * ratio - w) / 2
+      const marginY = (vh * ratio - h) / 2
+      ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
     },
     getCanvasStyle () {
       return {

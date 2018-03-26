@@ -13,6 +13,7 @@
       </span>
       <span class="header-item">
         <select v-model="videoTitle">
+          <option>Dog</option>
           <option>Cat</option>
           <option>Penguin</option>
         </select>
@@ -36,7 +37,8 @@
       :showNumber="showNumber"
       :dx="dimensions.x"
       :dy="dimensions.y"
-      :sources="sourcePath"
+      :src="src"
+      :sources="sources"
       :animation="animation"
       @init="onPuzzleBoardInit"
       @start="onPuzzleBoardStart"
@@ -49,27 +51,35 @@
 
 <script>
 // import PuzzleBoard from './components/PuzzleBoard'
-import PuzzleBoard from '../lib/main.js'
+import PuzzleBoard from './components/PuzzleBoard.vue'
 import penguinwebm from './assets/penguin.webm'
 import penguinmp4 from './assets/penguin.mp4'
 import catwebm from './assets/cat.webm'
 import catmp4 from './assets/cat.mp4'
+import dogjpg from './assets/dog.jpg'
 
 const SOURCEPATHS = {
-  Cat: [{
-    src: catwebm,
-    type: 'video/webm'
-  }, {
-    src: catmp4,
-    type: 'video/mp4'
-  }],
-  Penguin: [{
-    src: penguinwebm,
-    type: 'video/webm'
-  }, {
-    src: penguinmp4,
-    type: 'video/mp4'
-  }]
+  Dog: {
+    src: dogjpg
+  },
+  Cat: {
+    sources: [{
+      src: catwebm,
+      type: 'video/webm'
+    }, {
+      src: catmp4,
+      type: 'video/mp4'
+    }]
+  },
+  Penguin: {
+    sources: [{
+      src: penguinwebm,
+      type: 'video/webm'
+    }, {
+      src: penguinmp4,
+      type: 'video/mp4'
+    }]
+  }
 }
 const DIMENSIONS = {
   Easy: {x: 3, y: 3},
@@ -93,8 +103,13 @@ export default {
     }
   },
   computed: {
-    sourcePath () {
-      return SOURCEPATHS[this.videoTitle]
+    sources () {
+      const s = SOURCEPATHS[this.videoTitle].sources
+      console.log(s)
+      return s
+    },
+    src () {
+      return SOURCEPATHS[this.videoTitle].src
     },
     dimensions () {
       return DIMENSIONS[this.difficulty]
