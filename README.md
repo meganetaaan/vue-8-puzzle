@@ -37,8 +37,8 @@ Props      | Type   | Description                  | Default
 -----------|--------|------------------------------|--------------------------------
 src | String | source path | -
 sources | Array<Object> | source paths | -
-dx         | number  | number of columns
-dy         | number  | number of rows
+cols         | number  | number of columns | 4
+rows         | number  | number of rows | 4
 autoResize | boolean | when true the component fits to its root automatically | false
 showNumber | boolean | when true the component shows tile numbers on the video | true
 
