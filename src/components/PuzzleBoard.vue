@@ -10,18 +10,18 @@
     @mousedown.prevent
     @mouseup.prevent="onClick"
     @touchend.prevent="onTouchEnd"
-    :style="getCanvasStyle()"
+    :style="canvasStyle"
     :width="width * 2"
     :height="height"
     ></canvas>
-    <img v-if="isImage" :style="getSourceStyle()" :src="src" ref="sourceImg"/>
+    <img v-if="isImage" :style="sourceStyle" :src="src" ref="sourceImg"/>
     <video v-else ref="sourceImg"
     autoplay
     loop
     playsinline
     :muted="muted"
     :src="src"
-    :style="getSourceStyle()"
+    :style="sourceStyle"
     :width="width"
     :height="height">
     <source v-for="source of sources" v-bind:key="source.src" :src="source.src" :type="source.type" />
@@ -123,11 +123,20 @@ export default {
     },
     isImage () {
       return /\.(jpe?g|png|webm|gif)$/i.test(this.src)
+    },
+    canvasStyle () {
+      return {
+        left: this.isGoal ? '-100%' : 0
+      }
+    },
+    sourceStyle () {
+      return {
+        display: 'none'
+      }
     }
   },
   mounted () {
     this.onResize()
-    this.updateBlockPositions(!this.animation)
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     this._tmpCanvas = document.createElement('canvas')
     this._tmpCtx = this._tmpCanvas.getContext('2d')
@@ -299,6 +308,7 @@ export default {
       }
     },
     _loadImageToCanvas () {
+      // TODO: Refactor
       const sourceImg = this.$refs.sourceImg
       const canvas = this.$refs['puzzle-canvas']
       const ctx = canvas.getContext('2d')
@@ -341,16 +351,6 @@ export default {
       const marginX = (vw * ratio - w) / 2
       const marginY = (vh * ratio - h) / 2
       ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
-    },
-    getCanvasStyle () {
-      return {
-        left: this.isGoal ? '-100%' : 0
-      }
-    },
-    getSourceStyle () {
-      return {
-        display: 'none'
-      }
     },
     slide (idx) {
       if (!this._isStarted) {
