@@ -1,13 +1,21 @@
 Vue-8-puzzle
 ===
 
-An itty-bitty video-moving 8-puzzle game made as Vue.js component
+An itty-bitty slide puzzle game made as Vue.js component
 
 [PLAY DEMO](https://meganetaaan.github.io/vue-8-puzzle/)
 
 ![8-puzzle](doc/cat.gif)
 
-## Install
+Images/Videos for source
+
+![select-source](doc/select-source.gif)
+
+Auto-resize
+
+![resize](doc/resize.gif)
+
+## Install and Usage
 
 ```bash
 $ npm install vue-8-puzzle --save
