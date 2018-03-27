@@ -220,7 +220,8 @@ export default {
       this.blocks = this.board.blocks
     },
     blocks () {
-      this.updateBlockPositions(!this.animation)
+      const isImmediate = !this.animation
+      this.updateBlockPositions(isImmediate)
       this.isGoal = this.board.isGoal()
       this.manhattan = this.board.manhattan()
       this.hamming = this.board.hamming()
@@ -263,6 +264,7 @@ export default {
   methods: {
     initBoard () {
       this.board = createRandomBoard2D(this.cols, this.rows)
+      this._blockPositions = []
       this._isStarted = false
       this.$emit('init')
     },
@@ -364,15 +366,19 @@ export default {
       }
       const touch = event.changedTouches[0]
       const rect = this.$el.getBoundingClientRect()
-      const ev = {
-        offsetX: touch.clientX - rect.left,
-        offsetY: touch.clientY - rect.top
-      }
-      this.onClick(ev)
+      const x = touch.clientX - rect.left
+      const y = touch.clientY - rect.top
+      this.handleClick(x, y)
     },
     onClick (event) {
-      const x = (event.offsetX - (this.isGoal ? this.width : 0)) / this.cellWidth
-      const y = event.offsetY / this.cellHeight
+      // NOTE: canvas is shifted to left when finished
+      const x = event.offsetX - (this.isGoal ? this.width : 0)
+      const y = event.offsetY
+      this.handleClick(x, y)
+    },
+    handleClick (x, y) {
+      x = x / this.cellWidth
+      y = y / this.cellHeight
       const col = Math.floor(x)
       const row = Math.floor(y)
       const idx = row * this.cols + col
@@ -387,6 +393,9 @@ export default {
       if (this.autoResize) {
         this.width = w
         this.height = h
+      }
+      if (this.isImage) {
+        this.$nextTick(this._loadImageToCanvas.bind(this))
       }
       this.updateBlockPositions(true)
     },
