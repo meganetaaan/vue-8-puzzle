@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <div class="header">
-      <span class="header-item title">Vue-8-Puzzle</span>
+      <span class="header-item title" @click="onTitleClick">Vue-8-Puzzle</span>
       <span class="header-item distance"> d: {{distance}} </span>
       <span class="header-item">
         <label for="showNumber">#:</label>
@@ -114,6 +114,9 @@ export default {
     }
   },
   methods: {
+    onTitleClick () {
+      window.open('https://github.com/meganetaaan/vue-8-puzzle')
+    },
     onPuzzleBoardInit () {
       console.log('init')
     },
