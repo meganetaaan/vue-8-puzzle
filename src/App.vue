@@ -165,7 +165,7 @@ html,body {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  z-index: 1;
+  z-index: 2;
   font-size: 1.4em;
   position: absolute;
   width: 100%;
@@ -192,6 +192,7 @@ html,body {
   padding: 0px;
   max-width: 600px;
   max-height: 600px;
+  z-index: 1;
   background-color: #DDD;
 }
 </style>
