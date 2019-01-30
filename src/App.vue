@@ -113,12 +113,24 @@ export default {
       return DIMENSIONS[this.difficulty]
     }
   },
+  watch: {
+    isGoal (isGoal) {
+      if (isGoal) {
+        this.$confetti.start({
+          shape: 'rect'
+        })
+      } else {
+        this.$confetti.stop()
+      }
+    }
+  },
   methods: {
     onTitleClick () {
       window.open('https://github.com/meganetaaan/vue-8-puzzle')
     },
     onPuzzleBoardInit () {
       console.log('init')
+      this.isGoal = false
     },
     onPuzzleBoardStart () {
       console.log('start')
