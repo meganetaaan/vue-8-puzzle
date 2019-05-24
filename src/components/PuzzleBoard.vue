@@ -1,31 +1,37 @@
 <template>
-  <div class="puzzle-board"
-  tabindex="-1"
-  @keyup.prevent="onKeyUp"
-  @click="onClickBoard"
-  >
+  <div class="puzzle-board" tabindex="-1" @keyup.prevent="onKeyUp" @click="onClickBoard">
     <div class="puzzle-message" v-if="isTouchNeeded">Touch to start</div>
-    <canvas ref="puzzle-canvas" class="puzzle-canvas"
-    @click.prevent
-    @mousedown.prevent
-    @mouseup.prevent="onClick"
-    @touchend.prevent="onTouchEnd"
-    :style="canvasStyle"
-    :width="width * 2"
-    :height="height"
+    <canvas
+      ref="puzzle-canvas"
+      class="puzzle-canvas"
+      @click.prevent
+      @mousedown.prevent
+      @mouseup.prevent="onClick"
+      @touchend.prevent="onTouchEnd"
+      :style="canvasStyle"
+      :width="width * 2"
+      :height="height"
     ></canvas>
-    <img v-if="isImage" :style="sourceStyle" :src="src" ref="sourceImg"/>
-    <video v-else ref="sourceImg"
-    autoplay
-    loop
-    playsinline
-    :muted="muted"
-    :src="src"
-    :style="sourceStyle"
-    :width="width"
-    :height="height">
-    <source v-for="source of sources" v-bind:key="source.src" :src="source.src" :type="source.type" />
-    No video</video>
+    <img v-if="isImage" :style="sourceStyle" :src="src" ref="sourceImg">
+    <video
+      v-else
+      ref="sourceImg"
+      autoplay
+      loop
+      playsinline
+      :muted="muted"
+      :src="src"
+      :style="sourceStyle"
+      :width="width"
+      :height="height"
+    >
+      <source
+        v-for="source of sources"
+        v-bind:key="source.src"
+        :src="source.src"
+        :type="source.type"
+      >No video
+    </video>
   </div>
 </template>
 
@@ -67,7 +73,7 @@ const createRandomBoard2D = (dx, dy) => {
 
 export default {
   name: 'PuzzleBoard',
-  data () {
+  data() {
     this._blockPositions = []
     this._isStarted = false
     const board = createRandomBoard2D(this.cols, this.rows)
@@ -115,27 +121,27 @@ export default {
     }
   },
   computed: {
-    cellWidth () {
+    cellWidth() {
       return this.width / this.cols
     },
-    cellHeight () {
+    cellHeight() {
       return this.height / this.rows
     },
-    isImage () {
+    isImage() {
       return /\.(jpe?g|png|webm|gif)$/i.test(this.src)
     },
-    canvasStyle () {
+    canvasStyle() {
       return {
         left: this.isGoal ? '-100%' : 0
       }
     },
-    sourceStyle () {
+    sourceStyle() {
       return {
         display: 'none'
       }
     }
   },
-  mounted () {
+  mounted() {
     this.onResize()
     window.addEventListener('resize', debounce(this.onResize.bind(this), 300))
     this._tmpCanvas = document.createElement('canvas')
@@ -203,9 +209,17 @@ export default {
         }
         const targetX = pos.x
         const targetY = pos.y
-        ctx.drawImage(canvas,
-          sourceX, sourceY, this.cellWidth, this.cellHeight,
-          targetX, targetY, this.cellWidth, this.cellHeight)
+        ctx.drawImage(
+          canvas,
+          sourceX,
+          sourceY,
+          this.cellWidth,
+          this.cellHeight,
+          targetX,
+          targetY,
+          this.cellWidth,
+          this.cellHeight
+        )
         if (this.showNumber) {
           const text = String(block)
           const margin = 5
@@ -219,16 +233,16 @@ export default {
     this.$emit('init')
   },
   watch: {
-    cols () {
+    cols() {
       this.initBoard()
     },
-    rows () {
+    rows() {
       this.initBoard()
     },
-    board () {
+    board() {
       this.blocks = this.board.blocks
     },
-    blocks () {
+    blocks() {
       const isImmediate = !this.animation
       this.updateBlockPositions(isImmediate)
       this.isGoal = this.board.isGoal()
@@ -240,12 +254,12 @@ export default {
         distance: this.manhattan
       })
     },
-    isGoal () {
+    isGoal() {
       if (this.isGoal) {
         this.$emit('finish')
       }
     },
-    sources () {
+    sources() {
       if (!this.isImage) {
         // load and play video after the video element appears
         this.$nextTick(() => {
@@ -258,7 +272,7 @@ export default {
         })
       }
     },
-    src () {
+    src() {
       if (this.isImage) {
         this.isTouchNeeded = false
         // add onLoadImage hook after the img element appears
@@ -271,33 +285,33 @@ export default {
     }
   },
   methods: {
-    initBoard () {
+    initBoard() {
       this.board = createRandomBoard2D(this.cols, this.rows)
       this._blockPositions = []
       this._isStarted = false
       this.$emit('init')
     },
-    updateBlockPositions (isImmediate) {
+    updateBlockPositions(isImmediate) {
       for (let i = 0, len = this.blocks.length; i < len; i++) {
         const b = this.blocks[i]
         const col = this.board.col(i)
         const row = this.board.row(i)
         const x = this.cellWidth * col
         const y = this.cellHeight * row
-        const from = this._blockPositions[b] || {x: 0, y: 0}
+        const from = this._blockPositions[b] || { x: 0, y: 0 }
         if (this._blockPositions[b] == null) {
           this._blockPositions[b] = from
         }
         if (from.x - x === 0 && from.y - y === 0) {
           continue
         }
-        const obj = {x: from.x, y: from.y}
+        const obj = { x: from.x, y: from.y }
         if (isImmediate) {
           this._blockPositions[b].x = x
           this._blockPositions[b].y = y
         } else {
           new TWEEN.Tween(obj)
-            .to({x, y}, 200)
+            .to({ x, y }, 200)
             .easing(TWEEN.Easing.Quadratic.Out)
             .onUpdate(() => {
               this._blockPositions[b].x = obj.x
@@ -307,7 +321,7 @@ export default {
         }
       }
     },
-    _loadImageToCanvas () {
+    _loadImageToCanvas() {
       // TODO: Refactor
       const sourceImg = this.$refs.sourceImg
       const canvas = this.$refs['puzzle-canvas']
@@ -330,7 +344,7 @@ export default {
       const marginY = (vh * ratio - h) / 2
       ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
     },
-    _loadVideoFrameToCanvas () {
+    _loadVideoFrameToCanvas() {
       const sourceImg = this.$refs.sourceImg
       const canvas = this.$refs['puzzle-canvas']
       const ctx = canvas.getContext('2d')
@@ -352,7 +366,7 @@ export default {
       const marginY = (vh * ratio - h) / 2
       ctx.drawImage(this._tmpCanvas, marginX, marginY, w, h, w, 0, w, h)
     },
-    slide (idx) {
+    slide(idx) {
       if (!this._isStarted) {
         this._isStarted = true
         this.$emit('start')
@@ -360,7 +374,7 @@ export default {
       this.board.slide(idx)
       Vue.set(this, 'blocks', this.board.blocks.concat())
     },
-    onTouchEnd (event) {
+    onTouchEnd(event) {
       if (this.isTouchNeeded) {
         this.$refs.sourceImg.play()
       }
@@ -370,13 +384,13 @@ export default {
       const y = touch.clientY - rect.top
       this.handleClick(x, y)
     },
-    onClick (event) {
+    onClick(event) {
       // NOTE: canvas is shifted to left when finished
       const x = event.offsetX - (this.isGoal ? this.width : 0)
       const y = event.offsetY
       this.handleClick(x, y)
     },
-    handleClick (x, y) {
+    handleClick(x, y) {
       x = x / this.cellWidth
       y = y / this.cellHeight
       const col = Math.floor(x)
@@ -384,10 +398,10 @@ export default {
       const idx = row * this.cols + col
       this.slide(idx)
     },
-    onClickBoard () {
+    onClickBoard() {
       this.$el.focus()
     },
-    onResize () {
+    onResize() {
       const w = this.$el.offsetWidth
       const h = this.$el.offsetHeight
       if (this.autoResize) {
@@ -399,7 +413,7 @@ export default {
       }
       this.updateBlockPositions(true)
     },
-    onKeyUp (event) {
+    onKeyUp(event) {
       const bp = this.board.blankpos
       const len = this.blocks.length
       switch (event.keyCode) {
@@ -430,7 +444,8 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#sourceImg,#targetImg {
+#sourceImg,
+#targetImg {
   width: 300;
   height: 300;
 }
@@ -457,6 +472,6 @@ export default {
 .tile-number {
   position: absolute;
   text-shadow: 1px 1px 0 #222;
-  color: #FAFAFA;
+  color: #fafafa;
 }
 </style>
