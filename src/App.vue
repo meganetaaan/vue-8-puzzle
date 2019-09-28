@@ -22,7 +22,7 @@
         <input
           type="checkbox"
           id="animation"
-          v-model="animation"
+          v-model="show"
         >
       </div> -->
       <div class="header-item panel">
@@ -35,7 +35,7 @@
       </div>
     </div>
     <div class="container">
-      <puzzle-board
+      <puzzle-board v-if="show"
         :autoResize="autoResize"
         :showNumber="showNumber"
         :cols="dimensions.x"
@@ -43,12 +43,19 @@
         :src="src"
         :sources="sources"
         :animation="animation"
+        :width="width"
+        :height="height"
         @init="onPuzzleBoardInit"
         @start="onPuzzleBoardStart"
         @change="onPuzzleBoardChange"
         @finish="onPuzzleBoardFinish"
       />
     </div>
+    <div
+      class="repo"
+      @click="onTitleClick"
+    >made by <a target="_blank" rel="noopener noreferrer" href="https://github.com/meganetaaan/vue-8-puzzle">vue-8-puzzle</a>
+</div>
   </div>
 </template>
 
@@ -116,11 +123,14 @@ export default {
   },
   data() {
     return {
+      show: true,
       videoTitle: 'Cat',
       difficulty: 'Easy',
       distance: null,
       isGoal: false,
       autoResize: true,
+      width: 300,
+      height: 300,
       showNumber: true,
       animation: true,
       sources: SOURCEPATHS['Cat'].sources
@@ -229,13 +239,18 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0, 0, 0, 0.23);
-  width: 100%;
-  height: calc(100% - 60px);
+  width: 90%;
+  height: calc(90% - 60px);
   margin: 0px;
   padding: 0px;
-  max-width: 600px;
-  max-height: 600px;
   z-index: 1;
   background-color: #DDD;
+  max-width: 600px;
+  max-height: 600px;
+}
+.repo {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
 }
 </style>
