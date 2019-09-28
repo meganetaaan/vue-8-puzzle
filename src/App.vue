@@ -135,8 +135,6 @@ export default {
       return DIMENSIONS[this.difficulty]
     }
   },
-<<<<<<< Updated upstream
-=======
   watch: {
     isGoal(isGoal) {
       if (isGoal) {
@@ -157,7 +155,6 @@ export default {
       }
     }
   },
->>>>>>> Stashed changes
   methods: {
     onTitleClick() {
       window.open('https://github.com/meganetaaan/vue-8-puzzle')
@@ -246,11 +243,7 @@ body {
   padding: 0px;
   max-width: 600px;
   max-height: 600px;
-<<<<<<< Updated upstream
-  background-color: #DDD;
-=======
   z-index: 1;
   background-color: #ddd;
->>>>>>> Stashed changes
 }
 </style>
