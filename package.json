@@ -1,6 +1,6 @@
 {
   "name": "vue-8-puzzle",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Vue.js component of a simple slide puzzle game",
   "main": "lib/main.js",
   "author": "Shinya Ishikawa <ishikawa.s.1027@gmail.com>",
