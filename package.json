@@ -32,7 +32,8 @@
   "dependencies": {
     "lodash.debounce": "^4.0.8",
     "tween.js": "^16.6.0",
-    "vue": "^2.5.2"
+    "vue": "^2.5.2",
+    "vue-confetti": "^0.4.2"
   },
   "devDependencies": {
     "@types/jest": "^22.1.3",

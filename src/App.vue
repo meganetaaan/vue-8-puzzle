@@ -144,15 +144,6 @@ export default {
       } else {
         this.$confetti.stop()
       }
-    },
-    async videoTitle(title) {
-      if (title === 'Giphy') {
-        getGiphySrc().then(data => {
-          this.sources = data
-        })
-      } else {
-        this.sources = SOURCEPATHS[title].sources
-      }
     }
   },
   methods: {
@@ -166,6 +157,7 @@ export default {
     },
     onPuzzleBoardInit() {
       console.log('init')
+      this.isGoal = false
     },
     onPuzzleBoardStart() {
       console.log('start')
@@ -201,7 +193,7 @@ body {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  z-index: 1;
+  z-index: 2;
   font-size: 1.4em;
   position: absolute;
   width: 100%;
@@ -244,6 +236,6 @@ body {
   max-width: 600px;
   max-height: 600px;
   z-index: 1;
-  background-color: #ddd;
+  background-color: #DDD;
 }
 </style>
