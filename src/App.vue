@@ -105,7 +105,7 @@ const DIMENSIONS = {
 }
 const getGiphySrc = async function() {
   const res = await fetch(
-    'http://api.giphy.com/v1/gifs/random?api_key=nZATgU4T4iauIJqCFu8rFvoCxCqBRwMt&rating=g&tag=cat'
+    '//api.giphy.com/v1/gifs/random?api_key=nZATgU4T4iauIJqCFu8rFvoCxCqBRwMt&rating=g&tag=cat'
   )
   const data = await res.json()
   const url = data.data.image_mp4_url
