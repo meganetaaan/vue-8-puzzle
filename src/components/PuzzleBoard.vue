@@ -9,8 +9,8 @@
       @mouseup.prevent="onClick"
       @touchend.prevent="onTouchEnd"
       :style="canvasStyle"
-      :width="width * 2"
-      :height="height"
+      :width="internalWidth * 2"
+      :height="internalHeight"
     ></canvas>
     <img v-if="isImage" :style="sourceStyle" :src="src" ref="sourceImg">
     <video
@@ -22,8 +22,8 @@
       :muted="muted"
       :src="src"
       :style="sourceStyle"
-      :width="width"
-      :height="height"
+      :width="internalWidth"
+      :height="internalHeight"
     >
       <source
         v-for="source of sources"
@@ -83,9 +83,10 @@ export default {
       isGoal: false,
       manhattan: null,
       hamming: null,
-      width: 0,
-      height: 0,
-      board: board
+      internalWidth: this.width,
+      internalHeight: this.height,
+      board: board,
+      rafId: null
     }
   },
   props: {
@@ -107,6 +108,14 @@ export default {
       type: Number,
       default: 4
     },
+    width: {
+      type: Number,
+      default: 300
+    },
+    height: {
+      type: Number,
+      default: 300
+    },
     rows: {
       type: Number,
       default: 4
@@ -122,10 +131,10 @@ export default {
   },
   computed: {
     cellWidth() {
-      return this.width / this.cols
+      return this.internalWidth / this.cols
     },
     cellHeight() {
-      return this.height / this.rows
+      return this.internalHeight / this.rows
     },
     isImage() {
       return /\.(jpe?g|png|webm|gif)$/i.test(this.src)
@@ -137,8 +146,14 @@ export default {
     },
     sourceStyle() {
       return {
-        display: 'none'
+        // display: 'none'
+        visibility: 'hidden'
       }
+    }
+  },
+  beforeDestroy() {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId)
     }
   },
   mounted() {
@@ -167,7 +182,7 @@ export default {
       const sourceImg = this.$refs.sourceImg
       const canvas = this.$refs['puzzle-canvas']
       const ctx = canvas.getContext('2d')
-      const w = this.width
+      const w = this.internalWidth
 
       // copy from video
       if (sourceImg.currentTime !== this._lastRender) {
@@ -185,7 +200,7 @@ export default {
       }
 
       // main render
-      ctx.clearRect(0, 0, this.width, this.height)
+      ctx.clearRect(0, 0, this.internalWidth, this.internalHeight)
 
       // number
       if (this.showNumber) {
@@ -227,7 +242,7 @@ export default {
           ctx.fillText(text, margin + targetX, margin + targetY)
         }
       }
-      requestAnimationFrame(loop)
+      this.rafId = requestAnimationFrame(loop)
     }
     this.$nextTick(loop)
     this.$emit('init')
@@ -241,6 +256,12 @@ export default {
     },
     board() {
       this.blocks = this.board.blocks
+    },
+    width() {
+      this.onResize()
+    },
+    height() {
+      this.onResize()
     },
     blocks() {
       const isImmediate = !this.animation
@@ -348,8 +369,8 @@ export default {
       const sourceImg = this.$refs.sourceImg
       const canvas = this.$refs['puzzle-canvas']
       const ctx = canvas.getContext('2d')
-      const w = this.width
-      const h = this.height
+      const w = this.internalWidth
+      const h = this.internalHeight
       const vw = sourceImg.videoWidth
       const vh = sourceImg.videoHeight
       const ratio = Math.max(w / vw, h / vh)
@@ -405,8 +426,11 @@ export default {
       const w = this.$el.offsetWidth
       const h = this.$el.offsetHeight
       if (this.autoResize) {
-        this.width = w
-        this.height = h
+        this.internalWidth = w
+        this.internalHeight = h
+      } else {
+        this.internalWidth = this.width
+        this.internalHeight = this.height
       }
       if (this.isImage) {
         this.$nextTick(this._loadImageToCanvas.bind(this))
