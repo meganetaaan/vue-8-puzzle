@@ -80,7 +80,7 @@
     "power-assert": "^1.4.4",
     "rimraf": "^2.6.0",
     "semver": "^5.3.0",
-    "shelljs": "^0.7.6",
+    "shelljs": "^0.8.5",
     "ts-jest": "^22.4.0",
     "ts-loader": "^3",
     "typescript": "^2.7.2",
